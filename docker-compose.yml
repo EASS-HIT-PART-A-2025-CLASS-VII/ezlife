@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+    
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000" # Updated port mapping
+    volumes:
+      - ./backend:/app
+    environment:
+      - MONGO_URI=mongodb+srv://ezlifedb:ezlifepassword@ezlife.tyhljcz.mongodb.net/?retryWrites=true&w=majority&appName=EZlife
+      - HF_TOKEN=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
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend # Added depends_on to ensure frontend waits for backend
+
+  user-service:
+    build: ./backend/user-service
+    container_name: user-service
+    ports:
+      - "8001:8001"
+    environment:
+      - MONGO_URI=mongodb+srv://ezlifedb:ezlifepassword@ezlife.tyhljcz.mongodb.net/?retryWrites=true&w=majority&appName=EZlife

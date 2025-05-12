@@ -1,0 +1,8 @@
+fastapi
+pymongo
+python-dotenv
+uvicorn
+requests
+python-multipart
+passlib
+email-validator

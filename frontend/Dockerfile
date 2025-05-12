@@ -15,7 +15,8 @@ COPY package*.json ./
 ENV PYTHON=/usr/bin/python3
 RUN npm install -g node-gyp && \
     npm cache clean --force && \
-    NODE_ENV=development npm install --force && \
+    npm install && \
+    npm install -g vite && \
     npm rebuild
 
 # Copy the rest of the application

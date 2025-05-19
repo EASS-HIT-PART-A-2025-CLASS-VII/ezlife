@@ -1,11 +1,11 @@
 version: '3.9'
 
 services:
-    
   backend:
     build: ./backend
+    container_name: ezlife-backend
     ports:
-      - "8000:8000" # Updated port mapping
+      - "8000:8000"
     volumes:
       - ./backend:/app
     environment:
@@ -13,13 +13,14 @@ services:
       - HF_TOKEN=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
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ezlife-frontend
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
+      - "5173:80" # Frontend is served via Nginx on port 80 inside the container
     depends_on:
-      - backend # Added depends_on to ensure frontend waits for backend
+      - backend
 
   user-service:
     build: ./backend/user-service

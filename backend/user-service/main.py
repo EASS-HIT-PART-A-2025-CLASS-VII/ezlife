@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Form
 from pydantic import BaseModel
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -13,6 +13,17 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI()
+
+# Create test user function
+def create_test_user():
+    test_email = "test@test.com"
+    test_password = "12345678"
+    if not db.users.find_one({"email": test_email}):
+        hashed_password = hash_password(test_password)
+        db.users.insert_one({"email": test_email, "password": hashed_password, "created_at": datetime.utcnow()})
+        print(f"Created test user: {test_email}")
+    else:
+        print(f"Test user already exists: {test_email}")
 
 # Reconfigure CORS middleware
 app.add_middleware(
@@ -59,11 +70,21 @@ def register_user(user: User):
     return {"message": "User registered successfully"}
 
 @app.post("/token")
-def login_user(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = db.users.find_one({"email": form_data.username})
-    if not user or not verify_password(form_data.password, user["password"]):
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Look for user by email (OAuth2 uses username field)
+    print(f"Login attempt with username: {form_data.username}")
+    db_user = db.users.find_one({"email": form_data.username})
+    
+    if not db_user:
+        print(f"User not found: {form_data.username}")
         raise HTTPException(status_code=400, detail="Invalid credentials")
-    return {"access_token": user["email"], "token_type": "bearer"}
+        
+    if not verify_password(form_data.password, db_user["password"]):
+        print(f"Invalid password for user: {form_data.username}")
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+        
+    print(f"Login successful: {form_data.username}")
+    return {"access_token": db_user["email"], "token_type": "bearer"}
 
 # Update preflight handler to include CORS headers
 @app.options("/{path:path}")
@@ -74,6 +95,9 @@ def preflight_handler(path: str):
         "Access-Control-Allow-Headers": "*",
     }
     return JSONResponse(status_code=200, headers=headers)
+
+# Create test user on startup
+create_test_user()
 
 if __name__ == "__main__":
     import uvicorn

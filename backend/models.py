@@ -4,9 +4,9 @@ from datetime import datetime
 
 class Task(BaseModel):
     description: str
-    estimated_minutes: Optional[int] = None
-    completed: bool = False  # ✅ new field
-    due_date: Optional[datetime] = None  # 🆕 New field
+    estimated_minutes: int = 0
+    completed: bool = False
+    due_date: datetime
 
 class User(BaseModel):
     email: EmailStr

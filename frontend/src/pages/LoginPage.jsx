@@ -1,44 +1,51 @@
 // LoginPage.jsx - Login Page
-import "./LoginPage.css";
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
+import "./LoginPage.css"; // Make sure this file is in the same folder
 
 export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin({ email, password });
+    // Use onLogin prop instead of direct axios call
+    try {
+      onLogin({ email, password });
+    } catch (err) {
+      setError("Invalid email or password. Please try again.");
+    }
   };
-
   return (
     <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
+      <header className="login-header">
         <h1>Sign In</h1>
         <p>Access your EZlife account.</p>
+      </header>
+      
+      <div className="login-card">
+        <form className="login-form" onSubmit={handleSubmit}>
+          {error && <div className="error-message">{error}</div>}          <div className="form-field">
+            <label>Email address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <label>Email address</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit" className="btn-primary">Sign In</button>
-
-        <p className="forgot-password">
-          <a href="/forgot-password">Forgot your password?</a>
-        </p>
-      </form>
+          <div className="form-field">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>          <button type="submit" className="btn-primary">Sign In</button>
+        </form>
+      </div>
     </div>
   );
 }

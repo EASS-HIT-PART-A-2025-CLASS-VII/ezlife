@@ -28,45 +28,49 @@ export default function RegisterPage() {
     } catch (error) {
       setMessage("An error occurred. Please try again later.");
     }
-  };
-
-  return (
+  };  return (
     <div className="register-container">
-      <form className="register-form" onSubmit={handleSubmit}>
+      <header className="register-header">
         <h1>Create an Account</h1>
         <p>One account for everything EZlife.</p>
+      </header>
 
-        <label>Email address</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+      <div className="register-card">
+        <form className="register-form" onSubmit={handleSubmit}>
+          {message && <div className={message.includes("successful") ? "success-message" : "error-message"}>{message}</div>}          <div className="form-field">
+            <label>Email address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <label>Phone (optional)</label>
-        <input
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+          <div className="form-field">
+            <label>Phone (optional)</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
 
-        <label>Password</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          <div className="form-field">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>          <button type="submit" className="btn-primary">Create Account</button>
 
-        <button type="submit" className="btn-primary">Create Account</button>
-
-        {message && <p className="message">{message}</p>}
-
-        <p className="terms">
-          By clicking Create Account, you agree to our <a href="/terms">Terms</a> and have read our <a href="/privacy">Privacy Statement</a>.
-        </p>
-      </form>
+          <p className="terms">
+            By clicking Create Account, you agree to our <a href="/terms">Terms</a> and have read our <a href="/privacy">Privacy Statement</a>.
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

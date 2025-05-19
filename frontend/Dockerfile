@@ -1,28 +1,18 @@
-# Use Node 18 with Debian for better compatibility
-FROM node:18.19.1-slim
+# Stage 1: Build the React (Vite) app
+FROM node:18 AS builder
 
 WORKDIR /app
 
-# Install build essentials for native modules
-RUN apt-get update && \
-    apt-get install -y python3 make g++ && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy package files
 COPY package*.json ./
-
-# Configure npm and install dependencies
-ENV PYTHON=/usr/bin/python3
-RUN npm install -g node-gyp && \
-    npm cache clean --force && \
-    npm install && \
-    npm install -g vite && \
-    npm rebuild
-
-# Copy the rest of the application
+RUN npm install
 COPY . .
+RUN npm run build
 
-ENV HOST=0.0.0.0
-EXPOSE 5173
+# Stage 2: Serve the optimized build with Nginx
+FROM nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

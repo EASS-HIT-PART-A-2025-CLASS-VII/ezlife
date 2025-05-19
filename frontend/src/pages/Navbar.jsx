@@ -8,11 +8,14 @@ export default function Navbar({ isAuthenticated, onLogout }) {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/">EZlife</Link>
-      </div>
-      <div className="navbar-links">
+      </div>      <div className="navbar-links">
         <Link to="/">Home</Link>
         {isAuthenticated ? (
-          <button onClick={onLogout} className="btn-logout">Logout</button>
+          <>
+            <Link to="/tasks">Tasks</Link>
+            <Link to="/settings">Settings</Link>
+            <button onClick={onLogout} className="btn-logout">Logout</button>
+          </>
         ) : (
           <>
             <Link to="/login">Login</Link>

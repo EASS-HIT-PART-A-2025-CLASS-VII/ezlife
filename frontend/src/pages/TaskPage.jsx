@@ -1,72 +1,70 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./TaskPage.css";
+import api from "../utils/api";
 
-// Add Font Awesome for icons
-const iconStyle = {
-  marginRight: '5px'
-};
-
-export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAddTask, isLoading = false }) {
-  console.log("TaskPage rendered with tasks:", tasks);
+export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAddTask, isLoading = false, onTaskUpdate }) {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskEstimate, setNewTaskEstimate] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
+  const [newTaskDaysPerWeek, setNewTaskDaysPerWeek] = useState(5);
+  const [newTaskHoursPerDay, setNewTaskHoursPerDay] = useState(4);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [aiEstimating, setAiEstimating] = useState(false);  // New state for AI estimation status
-  
-  // Format date for display
+  const [aiEstimating, setAiEstimating] = useState(false);
+  const [filter, setFilter] = useState('all');
+  const [showBreakdownTaskId, setShowBreakdownTaskId] = useState(null);
+  const [breakdownResult, setBreakdownResult] = useState('');
+  const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
+
+  const fetchTasks = () => {
+    // Function stub for fetchTasks, may be used later
+    console.log("Fetching tasks...");
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
   const formatDate = (dateString) => {
     if (!dateString) return "No due date";
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (newTaskDescription.trim()) {
       setIsSubmitting(true);
-      
-      // If no time estimate is provided, indicate AI is estimating
       if (!newTaskEstimate) {
         setAiEstimating(true);
       }
-      
-      const taskData = { 
+
+      const taskData = {
         description: newTaskDescription.trim(),
-        completed: false
+        completed: false,
+        days_per_week: newTaskDaysPerWeek,
+        hours_per_day: newTaskHoursPerDay
       };
-      
-      // Add estimate if provided
+
       if (newTaskEstimate) {
         taskData.estimated_minutes = parseInt(newTaskEstimate);
       }
-      
-      // Add due date if provided
+
       if (newTaskDueDate) {
         taskData.due_date = new Date(newTaskDueDate).toISOString();
       }
-      
-      // Call onAddTask and handle the promise completion
+
       const addTaskPromise = onAddTask(taskData);
-      
-      // If onAddTask returns a promise, wait for it to complete
       if (addTaskPromise && typeof addTaskPromise.then === 'function') {
         addTaskPromise.then(() => {
           setIsSubmitting(false);
           setAiEstimating(false);
-          
-          // Reset form
           setNewTaskDescription("");
           setNewTaskEstimate("");
           setNewTaskDueDate("");
         });
       } else {
-        // If it's not a promise, just reset the state
         setIsSubmitting(false);
         setAiEstimating(false);
-        
-        // Reset form
         setNewTaskDescription("");
         setNewTaskEstimate("");
         setNewTaskDueDate("");
@@ -74,224 +72,180 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
     }
   };
 
-  // Calculate task statistics
-  const completedTasks = tasks.filter(task => task.completed).length;
-  const totalTasks = tasks.length;
-  const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const filteredTasks = tasks.filter(task => {
+    if (filter === 'all') return true;
+    if (filter === 'pending') return !task.completed;
+    if (filter === 'completed') return task.completed;
+    return true;
+  });
 
-  // Filter tasks based on active category
-  const filterTasksByCategory = () => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Helper function to check if a date is today
-    const isToday = (dateString) => {
-      if (!dateString) return false;
-      const date = new Date(dateString);
-      return date >= today && date < tomorrow;
-    };
-    
-    // Helper function to check if a date is in the future (not today)
-    const isFuture = (dateString) => {
-      if (!dateString) return false;
-      const date = new Date(dateString);
-      return date >= tomorrow;
-    };
-    
-    // Helper function to check if a date is in the past
-    const isPast = (dateString) => {
-      if (!dateString) return false;
-      const date = new Date(dateString);
-      return date < today;
-    };
-    
-    switch (activeCategory) {
-      case 'today':
-        return tasks.filter(task => !task.completed && isToday(task.due_date));
-      case 'upcoming':
-        return tasks.filter(task => !task.completed && isFuture(task.due_date));
-      case 'overdue':
-        return tasks.filter(task => !task.completed && isPast(task.due_date));
-      case 'completed':
-        return tasks.filter(task => task.completed);
-      case 'all':
-      default:
-        return tasks;
-    }
-  };
-  
-  const filteredTasks = filterTasksByCategory();
-  
-  // Task category counts for displaying badges
-  const categoryCounts = {
-    all: tasks.length,
-    today: tasks.filter(task => {
-      if (!task.due_date || task.completed) return false;
-      const dueDate = new Date(task.due_date);
-      const today = new Date();
-      return dueDate.getDate() === today.getDate() &&
-             dueDate.getMonth() === today.getMonth() &&
-             dueDate.getFullYear() === today.getFullYear();
-    }).length,
-    upcoming: tasks.filter(task => {
-      if (!task.due_date || task.completed) return false;
-      const dueDate = new Date(task.due_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      return dueDate >= tomorrow;
-    }).length,
-    overdue: tasks.filter(task => {
-      if (!task.due_date || task.completed) return false;
-      const dueDate = new Date(task.due_date);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      return dueDate < today;
-    }).length,
-    completed: completedTasks
-  };
-  
-  return (
-    <div className="taskpage-container">
-      <header className="taskpage-header">
-        <h1>Your Tasks</h1>
-        <p>Manage your tasks efficiently and stay organized.</p>
-      </header>
-      
-      <div className="task-content-container">
-        <form onSubmit={handleSubmit} className="add-task-form">
-          <div className="form-row">
+  const pendingTasksCount = tasks.filter(task => !task.completed).length;
+  const completedTasksCount = tasks.filter(task => task.completed).length;  return (
+    <div className="page-container taskpage-container">
+      <div className="task-page-content">
+        <h1 className="page-title">Your Tasks</h1>
+        <p className="page-subtitle">Manage your tasks efficiently and stay organized.</p>
+
+        <div className="task-form-container">
+        <h2>Add a New Task</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="task-input-group">
             <input
               type="text"
-              placeholder="Add a new task..."
+              className="form-input"
+              placeholder="Enter task description"
               value={newTaskDescription}
               onChange={(e) => setNewTaskDescription(e.target.value)}
-              className="task-input"
-              disabled={isSubmitting}
               required
             />
-          </div>          <div className="form-row">
-            <div className="estimate-input-container">
-              <input
-                type="number"
-                placeholder={aiEstimating ? "AI is estimating..." : "Estimated minutes (leave blank for AI estimate)"}
-                value={newTaskEstimate}
-                onChange={(e) => setNewTaskEstimate(e.target.value)}
-                className={`task-estimate ${aiEstimating ? 'ai-estimating' : ''}`}
-                disabled={isSubmitting}
-                min="1"
-              />
-              {aiEstimating && <div className="ai-estimate-spinner"></div>}
-            </div>
             <input
               type="date"
-              placeholder="Due date"
+              className="form-input"
               value={newTaskDueDate}
               onChange={(e) => setNewTaskDueDate(e.target.value)}
-              className="task-due-date"
-              disabled={isSubmitting}
             />
-            <button type="submit" className="btn-add" disabled={isSubmitting || !newTaskDescription.trim()}>
-              {isSubmitting ? (aiEstimating ? 'Estimating...' : 'Adding...') : 'Add Task'}
+          </div>
+          <div className="task-input-group">
+            <input
+              type="number"
+              className="form-input"
+              placeholder="Estimated minutes (optional)"
+              value={newTaskEstimate}
+              onChange={(e) => setNewTaskEstimate(e.target.value)}
+            />
+            <input
+              type="number"
+              className="form-input"
+              placeholder="Days per week (optional)"
+              value={newTaskDaysPerWeek}
+              onChange={(e) => setNewTaskDaysPerWeek(e.target.value)}
+            />
+            <input
+              type="number"
+              className="form-input"
+              placeholder="Hours per day (optional)"
+              value={newTaskHoursPerDay}
+              onChange={(e) => setNewTaskHoursPerDay(e.target.value)}
+            />
+          </div>
+          <div className="d-flex justify-content-between align-items-center">
+            <button type="submit" className="btn btn-primary">Add Task</button>
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              disabled={aiEstimating || !newTaskDescription}
+              onClick={() => {
+                if (newTaskDescription) {
+                  setAiEstimating(true);
+                  // Normally would call AI estimation API here
+                  setTimeout(() => {
+                    setNewTaskEstimate("60"); // Simulated response
+                    setAiEstimating(false);
+                  }, 1000);
+                }
+              }}
+            >
+              {aiEstimating ? 'Estimating...' : 'AI Estimate Time'}
             </button>
           </div>
         </form>
-        
-        {/* Overall progress bar */}
-        <div className="task-progress">
-          <h3>Overall Progress</h3>
-          <div className="progress-bar-container">
-            <div 
-              className="progress-bar" 
-              style={{ width: `${completionRate}%` }}
-              aria-valuenow={completionRate}
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              {completionRate.toFixed(0)}%
-            </div>
-          </div>
-          <div className="progress-stats">
-            <div className="progress-stat">
-              <span>{completedTasks}</span> of <span>{totalTasks}</span> tasks completed
-            </div>
-          </div>
-        </div>
-        
-        {/* Task category tabs */}
-        <div className="task-categories">
-          <button 
-            className={`category-tab ${activeCategory === 'all' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('all')}
-          >
-            All <span className="category-count">{categoryCounts.all}</span>
-          </button>
-          <button 
-            className={`category-tab ${activeCategory === 'today' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('today')}
-          >
-            Today <span className="category-count">{categoryCounts.today}</span>
-          </button>
-          <button 
-            className={`category-tab ${activeCategory === 'upcoming' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('upcoming')}
-          >
-            Upcoming <span className="category-count">{categoryCounts.upcoming}</span>
-          </button>
-          <button 
-            className={`category-tab ${activeCategory === 'overdue' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('overdue')}
-          >
-            Overdue <span className="category-count danger">{categoryCounts.overdue}</span>
-          </button>
-          <button 
-            className={`category-tab ${activeCategory === 'completed' ? 'active' : ''}`}
-            onClick={() => setActiveCategory('completed')}
-          >
-            Completed <span className="category-count success">{categoryCounts.completed}</span>
-          </button>
-        </div>
-      
-        <div className="tasks-section">
-          <h2>{activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Tasks</h2>
-          <ul className="task-list">
-            {isLoading ? (
-              <li className="loading-tasks">Loading tasks...</li>
-            ) : filteredTasks.length > 0 ? (
-              filteredTasks.map((task) => (
-                <li key={task.id} className={`task-item ${task.completed ? "completed" : ""}`}>
-                  <div className="task-content">
-                    <h3 className="task-description">{task.description}</h3>
-                    <div className="task-details">                  
-                      {task.estimated_minutes > 0 && (
-                        <span className="task-estimate">
-                          <span style={iconStyle}>⏱️</span> Estimate: {task.estimated_minutes} minutes
-                        </span>
-                      )}
-                      {task.due_date && (
-                        <span className={`task-due-date ${new Date(task.due_date) < new Date() && !task.completed ? 'overdue' : ''}`}>
-                          <span style={iconStyle}>📅</span> Due: {formatDate(task.due_date)}
-                        </span>
-                      )}
-                    </div>
+      </div>
+
+      <div className="progress-section">
+        <h2 className="mb-1">Overall Progress</h2>
+        <progress value={tasks.length > 0 ? completedTasksCount : 0} max={tasks.length > 0 ? tasks.length : 1}></progress>
+        <p>{completedTasksCount} of {tasks.length} tasks completed</p>
+      </div>
+
+      <div className="category-tabs">
+        <button
+          className={`category-tab all ${filter === 'all' ? 'active' : ''}`}
+          onClick={() => setFilter('all')}
+        >
+          All ({tasks.length})
+        </button>
+        <button
+          className={`category-tab pending ${filter === 'pending' ? 'active' : ''}`}
+          onClick={() => setFilter('pending')}
+        >
+          Pending ({pendingTasksCount})
+        </button>
+        <button
+          className={`category-tab completed ${filter === 'completed' ? 'active' : ''}`}
+          onClick={() => setFilter('completed')}
+        >
+          Completed ({completedTasksCount})
+        </button>
+      </div>
+
+      <div className="task-list-container">
+        <h2 className="task-list-header">
+          {filter === 'all' ? 'All Tasks' : filter === 'pending' ? 'Pending Tasks' : 'Completed Tasks'}
+        </h2>
+        {isLoading ? (
+          <p>Loading tasks...</p>
+        ) : filteredTasks.length === 0 ? (
+          <p>No tasks in this category.</p>
+        ) : (          <ul className="task-list">
+            {filteredTasks.map(task => (
+              <li key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                <div className="task-item-content">
+                  <strong className={task.completed ? 'text-muted' : ''}>{task.description}</strong>
+                  <div className="task-item-details">
+                    {task.due_date && <small className="text-muted">Due: {formatDate(task.due_date)}</small>}
+                    {task.estimated_minutes && <small className="text-muted">Est: {task.estimated_minutes} mins</small>}
                   </div>
-                  <div className="task-actions">
-                    <button onClick={() => onToggleTask(task.id)} className={`btn-toggle ${task.completed ? 'completed' : ''}`}>
-                      {task.completed ? "Undo" : "Complete"}
-                    </button>
-                    <button onClick={() => onDeleteTask(task.id)} className="btn-delete">Delete</button>
+                </div>
+                <div className="task-actions">
+                  {!task.completed && (
+                    <button onClick={() => onToggleTask(task.id)} className="btn btn-success">Complete</button>
+                  )}
+                  <button onClick={() => onDeleteTask(task.id)} className="btn btn-danger">Delete</button>
+                  <button 
+                    onClick={() => {
+                      if (showBreakdownTaskId === task.id) {
+                        setShowBreakdownTaskId(null);
+                      } else {
+                        setShowBreakdownTaskId(task.id);
+                        setIsLoadingBreakdown(true);
+                        // Simulate loading a breakdown
+                        setTimeout(() => {
+                          setBreakdownResult(`<p>Task breakdown for "${task.description}":</p>
+                            <ul>
+                              <li>Step 1: Research and planning (30% of time)</li>
+                              <li>Step 2: Implementation (50% of time)</li>
+                              <li>Step 3: Testing and review (20% of time)</li>
+                            </ul>`);
+                          setIsLoadingBreakdown(false);
+                        }, 1000);
+                      }
+                    }} 
+                    className="btn btn-info"
+                    disabled={isLoadingBreakdown && showBreakdownTaskId === task.id}
+                  >
+                    {isLoadingBreakdown && showBreakdownTaskId === task.id ? 'Working...' : (showBreakdownTaskId === task.id ? 'Hide Breakdown' : 'Breakdown Task')}
+                  </button>
+                </div>
+                {showBreakdownTaskId === task.id && (
+                  <div className="task-breakdown-view">
+                    {isLoadingBreakdown ? (
+                      <p>Generating breakdown...</p>
+                    ) : (
+                      <>
+                        <h4>Task Breakdown:</h4>
+                        {breakdownResult ? (
+                          <div className="breakdown-content" dangerouslySetInnerHTML={{ __html: breakdownResult }}></div>
+                        ) : (
+                          <p>No breakdown available or an error occurred.</p>
+                        )}
+                      </>
+                    )}
                   </div>
-                </li>
-              ))
-            ) : (
-              <li className="no-tasks">No {activeCategory} tasks found.</li>
-            )}
-          </ul>
-        </div>
+                )}
+              </li>
+            ))}          </ul>
+        )}
+      </div>
       </div>
     </div>
   );

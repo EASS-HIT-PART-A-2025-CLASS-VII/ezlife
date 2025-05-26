@@ -1,22 +1,26 @@
 /* Ensure full responsiveness and modern design for Navbar */
 .navbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens if needed before media query */
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #2c3e50;
-  color: white;
+  padding: var(--navbar-padding-vertical) var(--navbar-padding-horizontal); /* Use CSS variables */
+  background-color: var(--card-background);
+  color: var(--text-color);
+  box-shadow: 0 2px 5px var(--shadow-color);
   box-sizing: border-box;
   width: 100%;
+  height: var(--navbar-height); /* Use CSS variable */
   z-index: 1000;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  transition: height 0.3s ease-in-out; /* Smooth transition for height changes */
 }
 
 .navbar-brand a {
   font-size: 1.5rem;
-  color: white;
+  color: var(--primary-color); /* Use theme variable for brand */
   text-decoration: none;
   font-weight: bold;
 }
@@ -28,35 +32,32 @@
 }
 
 .navbar-links a {
-  color: white;
+  color: var(--text-color); /* Use theme variable */
   text-decoration: none;
   font-size: 1rem;
   transition: color 0.3s;
   white-space: nowrap;
 }
 
-.navbar-links a:hover {
-  color: #3498db;
+.navbar-links a:hover,
+.navbar-links a.active { /* Style for active link */
+  color: var(--primary-color); /* Use theme variable */
+  font-weight: 500; /* Slightly bolder for active/hover */
 }
 
 .btn-logout {
-  padding: 0.5rem 1rem;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  /* Styles are now in common.css, this can be removed or used for very specific overrides */
+  /* For example, if you need different padding ONLY for the navbar logout button */
+  padding: 0.5em 1em; /* Example of a specific override */
 }
 
-.btn-logout:hover {
-  background-color: #c0392b;
-}
-
+/* Responsive adjustments */
 @media (max-width: 1024px) {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
+    /* Height is now controlled by --navbar-height variable from index.css */
+    /* Padding is also controlled by variables from index.css if needed, or can be overridden here */
   }
 
   .navbar-links {
@@ -71,16 +72,26 @@
   .navbar-links a {
     text-align: center;
     flex: 1;
+    padding: 0.5rem; /* Add padding for better touch targets */
+    border-radius: 4px; /* Add border-radius for a button-like feel on mobile */
+  }
+
+  .navbar-links a:hover,
+  .navbar-links a.active {
+    background-color: var(--primary-color); /* Background for active/hover on mobile */
+    color: white; /* Text color for active/hover on mobile */
   }
   
   .btn-logout {
     margin-top: 0.5rem;
-    width: 100%;
+    width: 100%; /* Full width on smaller screens */
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
+    /* Padding and height are controlled by variables from index.css */
+    /* Specific overrides for this breakpoint can still be made here if necessary */
     padding: 0.5rem 1rem;
   }
 

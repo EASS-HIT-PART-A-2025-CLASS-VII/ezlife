@@ -70,59 +70,61 @@ const TaskProgress = ({ tasks = [] }) => {
 
 export default function HomePage({ isAuthenticated, onLogout, tasks = [] }) {
   return (
-    <div className="homepage-container">
-      <header className="homepage-header">
-        <h1>Welcome to EZlife</h1>
-        <p>Organize your tasks effortlessly with our modern task manager.</p>
-      </header>
-      
-      {isAuthenticated ? (
-        <div className="logged-in-container">
-          <div className="welcome-message">
-            <h2>Your Dashboard</h2>
-            <p>Good to see you again! Ready to be productive today?</p>
-            <button onClick={onLogout} className="btn-logout">Logout</button>
-          </div>
-          
-          {/* Task Progress Component */}
-          <TaskProgress tasks={tasks} />
-          
-          <div className="feature-cards">
-            <div className="feature-card">
-              <div className="feature-icon">📝</div>
-              <h3>Manage Tasks</h3>
-              <p>Create, track, and complete your daily tasks.</p>
-              <Link to="/tasks" className="btn-primary">Go to Tasks</Link>
+    <div className="page-container"> {/* Use common page-container */}
+      <div className="homepage-content-wrapper"> {/* Wrapper for homepage specific layout */}
+        <header className="homepage-header">
+          <h1>Welcome to EZlife</h1>
+          <p>Organize your tasks effortlessly with our modern task manager.</p>
+        </header>
+        
+        {isAuthenticated ? (
+          <div className="logged-in-container">
+            <div className="welcome-message">
+              <h2>Your Dashboard</h2>
+              <p>Good to see you again! Ready to be productive today?</p>
+              <button onClick={onLogout} className="btn-logout">Logout</button>
             </div>
             
-            <div className="feature-card">
-              <div className="feature-icon">⏱️</div>
-              <h3>Time Estimation</h3>
-              <p>AI-powered time estimation helps you plan your day better.</p>
+            {/* Task Progress Component */}
+            <TaskProgress tasks={tasks} />
+            
+            <div className="feature-cards">
+              <div className="feature-card">
+                <div className="feature-icon">📝</div>
+                <h3>Manage Tasks</h3>
+                <p>Create, track, and complete your daily tasks.</p>
+                <Link to="/tasks" className="btn-primary">Go to Tasks</Link>
+              </div>
+              
+              <div className="feature-card">
+                <div className="feature-icon">⏱️</div>
+                <h3>Time Estimation</h3>
+                <p>AI-powered time estimation helps you plan your day better.</p>
+              </div>
+              
+              <div className="feature-card">
+                <div className="feature-icon">📅</div>
+                <h3>Due Date Tracking</h3>
+                <p>Never miss a deadline with our due date reminders.</p>
+              </div>
             </div>
             
-            <div className="feature-card">
-              <div className="feature-icon">📅</div>
-              <h3>Due Date Tracking</h3>
-              <p>Never miss a deadline with our due date reminders.</p>
+            <div className="quick-stats">
+              <h3>Quick Tips</h3>
+              <ul>
+                <li>Break down large tasks into smaller ones</li>
+                <li>Use AI time estimation for better planning</li>
+                <li>Set realistic due dates for your tasks</li>
+              </ul>
             </div>
           </div>
-          
-          <div className="quick-stats">
-            <h3>Quick Tips</h3>
-            <ul>
-              <li>Break down large tasks into smaller ones</li>
-              <li>Use AI time estimation for better planning</li>
-              <li>Set realistic due dates for your tasks</li>
-            </ul>
+        ) : (
+          <div className="homepage-actions">
+            <Link to="/login" className="btn-secondary">Login</Link>
+            <Link to="/register" className="btn-secondary">Register</Link>
           </div>
-        </div>
-      ) : (
-        <div className="homepage-actions">
-          <Link to="/login" className="btn-secondary">Login</Link>
-          <Link to="/register" className="btn-secondary">Register</Link>
-        </div>
-      )}
+        )}
+      </div> {/* Close homepage-content-wrapper */}
     </div>
   );
 }

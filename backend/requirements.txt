@@ -6,3 +6,4 @@ requests
 python-multipart
 email-validator
 passlib[bcrypt]
+httpx # Added for making async HTTP requests

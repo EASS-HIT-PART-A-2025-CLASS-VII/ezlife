@@ -13,9 +13,9 @@ html, body {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
-  background-color: #f9f9f9;
+  background-color: var(--background-color);
   font-family: Arial, sans-serif;
-  color: #333;
+  color: var(--text-color);
   min-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -30,13 +30,13 @@ html, body {
 
 .homepage-header h1 {
   font-size: 2.5rem;
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 0.5rem;
 }
 
 .homepage-header p {
   font-size: 1.2rem;
-  color: #7f8c8d;
+  color: var(--text-light);
 }
 
 /* Styles for logged-in users */

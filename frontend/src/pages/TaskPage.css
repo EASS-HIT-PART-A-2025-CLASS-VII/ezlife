@@ -1,96 +1,150 @@
-/* filepath: c:\Users\Leon\Desktop\EZlife\frontend\src\pages\TaskPage.css.new */
-/* Ensure full responsiveness and modern design for TaskPage */
+/* filepath: c:\Users\Leon\Desktop\EZlife\frontend\src\pages\TaskPage.css */
+
+/* Apply .page-container styles from common.css to the root element in TaskPage.jsx if not already done */
+
+/* Base container - extends page-container from common.css with specific task page styles */
 .taskpage-container {
+  background-color: var(--background-color);
+  padding-top: 2rem;
+  /* Inherits other styles from .page-container in common.css */
+}
+
+.task-page-content {
+  width: 100%;
+  max-width: 800px; /* Match common.css max-width for consistency */
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  min-height: 80vh;
-  padding: 2rem;
-  box-sizing: border-box;
-  background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
-  color: #333;
+}
+
+.task-page-content .page-title {
+  margin-bottom: 0.5rem;
+  font-size: 2.2rem;
+  color: var(--text-color);
+  text-align: center;
+}
+
+.task-page-content .page-subtitle {
+  margin-bottom: 2rem;
+  color: var(--text-light);
+  text-align: center;
 }
 
 .taskpage-header {
   text-align: center;
   margin-bottom: 2rem;
   width: 100%;
-  max-width: 800px;
+  max-width: 800px; /* Or use a utility class for width limiting */
 }
 
-.taskpage-header h1 {
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-}
-
-.taskpage-header p {
-  font-size: 1.2rem;
-  color: #7f8c8d;
-}
+/* .taskpage-header h1 should use .page-title from common.css */
+/* .taskpage-header p should use .page-subtitle from common.css */
 
 .task-content-container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 800px; /* Changed from 1200px to match other containers */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Form styling */
-.add-task-form {
+/* Task form container */
+.task-form-container {
   width: 100%;
-  margin-bottom: 2rem;
-  background-color: #fff;
+  max-width: 700px;
+  background-color: var(--card-background);
   border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  margin: 0 auto 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.form-row {
+.task-form-container h2 {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
+.task-form-container h2:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: #eee;
+}
+
+.task-form-container form {
+  width: 100%;
+  padding-top: 0.5rem;
+}
+
+/* Form styling */
+/* .add-task-form in JSX should have className="content-card" */
+.add-task-form .form-row { /* Target .form-row specifically within .add-task-form */
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap; /* Allow wrapping for responsiveness */
 }
 
-.form-row:last-child {
+.add-task-form .form-row:last-child {
   margin-bottom: 0;
 }
 
-.task-input, .task-estimate, .task-due-date {
-  padding: 0.8rem;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1rem;
-  flex: 1;
-  transition: border-color 0.3s;
-}
+/* Input fields should use className="input-field" from common.css in JSX */
+/* Buttons should use className="btn btn-primary" etc. from common.css in JSX */
 
-.task-input:focus, .task-estimate:focus, .task-due-date:focus {
-  outline: none;
-  border-color: #3498db;
-}
-
-.btn-add {
-  padding: 0.8rem 1.5rem;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s;
-}
-
-.btn-add:hover {
-  background-color: #2980b9;
-}
-
-.btn-add:disabled {
-  background-color: #95a5a6;
+.add-task-form .btn-add:disabled { /* Target .btn-add specifically */
+  background-color: var(--text-light); /* Use theme variable for disabled state */
   cursor: not-allowed;
+  border-color: var(--text-light);
+}
+
+/* Form input group styling */
+.task-input-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* Form input styling - should match input-field from common.css */
+.form-input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white; /* Solid white background for better visibility */
+  color: var(--text-color);
+  flex: 1;
+  min-width: 200px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Button container */
+.task-form-container .d-flex {
+  width: 100%;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 /* AI estimation styling */
@@ -99,138 +153,150 @@
   flex: 1;
   display: flex;
   align-items: center;
+  min-width: 200px; /* Ensure it doesn't get too small */
 }
 
-.task-estimate.ai-estimating {
-  padding-right: 35px; /* Make room for spinner */
-  background-color: rgba(52, 152, 219, 0.05);
-  border-color: var(--primary-color);
+.task-estimate.ai-estimating { /* This class is added to the input field itself */
+  padding-right: 35px; 
+  background-color: color-mix(in srgb, var(--primary-color) 5%, transparent); /* Subtle background tint */
+  border-color: var(--primary-color); 
 }
 
 .ai-estimate-spinner {
   position: absolute;
   right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  border: 3px solid rgba(52, 152, 219, 0.2);
-  border-top: 3px solid var(--primary-color);
+  border: 3px solid color-mix(in srgb, var(--primary-color) 20%, transparent);
+  border-top-color: var(--primary-color); /* Use theme variable */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
 }
 
-/* Progress bar styling */
-.task-progress {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+/* Progress section */
+.progress-section {
   width: 100%;
-  margin-bottom: 2rem;
+  max-width: 700px;
+  background-color: var(--card-background);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  margin: 0 auto 2.5rem;
   text-align: center;
 }
 
-.task-progress h3 {
-  font-size: 1.3rem;
-  color: #2c3e50;
-  margin-bottom: 1rem;
+.progress-section h2 {
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-bottom: 1.2rem;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
 }
 
-.progress-bar-container {
+.progress-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 30%;
+  right: 30%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+}
+
+.progress-section progress {
   width: 100%;
-  background-color: #ecf0f1;
-  border-radius: 10px;
-  height: 20px;
-  margin-bottom: 1rem;
-  overflow: hidden;
+  height: 24px;
+  border-radius: 12px;
+  margin-bottom: 0.8rem;
 }
 
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+/* Progress bar styling */
+progress {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #f1f1f1;
   border-radius: 10px;
-  color: white;
-  text-align: right;
-  padding-right: 10px;
-  font-size: 0.85rem;
-  line-height: 20px;
-  transition: width 0.5s ease;
-  min-width: 30px;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 10px;
+}
+
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 10px;
 }
 
 .progress-stats {
-  color: #7f8c8d;
+  color: var(--text-light);
   font-size: 1rem;
 }
 
 .progress-stats span {
   font-weight: bold;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 
 /* Task categories styling */
-.task-categories {
+.category-tabs {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
-  margin: 1.5rem 0;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0 auto 1.8rem;
   width: 100%;
+  max-width: 700px; /* Match other components */
 }
 
 .category-tab {
-  padding: 0.6rem 1.2rem;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 50px;
+  padding: 0.7rem 1.3rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-background);
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  transition: all 0.3s;
+  min-width: 130px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.category-tab:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
 }
 
 .category-tab.active {
   background-color: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
-  font-weight: 500;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Specific styles for different category tabs */
-.category-tab:nth-child(1).active {
-  background-color: #3498db;
-  border-color: #3498db;
-}
-
-.category-tab:nth-child(2).active {
-  background-color: #2ecc71;
-  border-color: #2ecc71;
-}
-
-.category-tab:nth-child(3).active {
-  background-color: #9b59b6;
-  border-color: #9b59b6;
-}
-
-.category-tab:nth-child(4).active {
-  background-color: #e74c3c;
-  border-color: #e74c3c;
-}
-
-.category-tab:nth-child(5).active {
-  background-color: #2c3e50;
-  border-color: #2c3e50;
+.category-tab.active .category-count {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white; /* Ensure count is visible on active tab */
 }
 
 .category-count {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--border-color); /* Use theme variable */
+  color: var(--text-color); /* Use theme variable */
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 0.75rem;
@@ -238,31 +304,176 @@
   text-align: center;
 }
 
-.category-tab.active .category-count {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.category-count.danger {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.category-count.success {
-  background-color: #2ecc71;
-  color: white;
-}
-
-/* Tasks section */
-.tasks-section {
-  background-color: #fff;
+/* Task list container */
+.task-list-container {
+  width: 100%;
+  max-width: 700px;
+  background-color: var(--card-background);
   border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  margin: 0 auto;
+}
+
+.task-list-header {
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.task-list-header:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: #eee;
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
   width: 100%;
 }
 
+.task-item {
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-background);
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.task-item:last-child {
+  margin-bottom: 0;
+}
+
+.task-item:hover {
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.task-item-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: var(--card-background);
+  border-radius: 6px;
+}
+
+.task-item-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.3rem;
+  width: 100%;
+}
+
+.task-item strong {
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.task-item small {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  background-color: color-mix(in srgb, var(--background-color) 90%, var(--border-color) 10%);
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  min-width: 130px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: color-mix(in srgb, var(--secondary-color) 80%, black);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: color-mix(in srgb, var(--danger-color) 80%, black);
+}
+
+.btn-success {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: color-mix(in srgb, var(--secondary-color) 80%, black);
+}
+
+.btn-info {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-info:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 80%, black);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tasks section */
+/* .tasks-section in JSX should have className="content-card" */
+
 .tasks-section h2 {
-  color: #2c3e50;
+  /* Should use .card-title from common.css */
+  color: var(--text-color);
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -280,52 +491,70 @@
   align-items: center;
   padding: 1rem;
   margin-bottom: 1rem;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: var(--card-background); /* Use theme variable */
+  border-radius: var(--border-radius-medium, 8px); /* Use a variable or fallback */
+  box-shadow: var(--shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.05)); /* Use a variable or fallback */
   transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--border-color);
 }
 
 .task-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md, 0 4px 8px rgba(0, 0, 0, 0.1)); /* Use a variable or fallback */
 }
 
 .task-item.completed {
-  background-color: #f8f9fa;
+  background-color: color-mix(in srgb, var(--background-color) 60%, var(--card-background) 40%);
+  opacity: 0.85;
+  border-color: color-mix(in srgb, var(--border-color) 70%, var(--secondary-color) 30%);
+}
+
+.task-item.completed .task-item-content {
+  background-color: transparent;
 }
 
 .task-item.completed .task-description {
   text-decoration: line-through;
-  color: #7f8c8d;
+  color: var(--text-light);
+}
+
+.task-item.completed strong {
+  text-decoration: line-through;
+  color: var(--text-light);
 }
 
 .task-content {
   flex: 1;
+  margin-right: 1rem; /* Add some space before actions */
 }
 
 .task-description {
   margin: 0;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
-  color: #2c3e50;
+  color: var(--text-color);
+  cursor: pointer; /* Indicate it's clickable for breakdown */
+}
+
+.task-description:hover {
+  color: var(--primary-color);
 }
 
 .task-details {
   display: flex;
   gap: 1rem;
   font-size: 0.9rem;
-  color: #7f8c8d;
+  color: var(--text-light);
   flex-wrap: wrap;
 }
 
-.task-estimate, .task-due-date {
+.task-estimate-display, .task-due-date-display {
   display: flex;
   align-items: center;
 }
 
-.task-due-date.overdue {
-  color: #e74c3c;
+.task-due-date-display.overdue {
+  color: var(--danger-color);
   font-weight: 500;
 }
 
@@ -334,109 +563,306 @@
   gap: 0.5rem;
 }
 
-.btn-toggle {
-  padding: 0.5rem 1rem;
-  background-color: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
+/* Buttons in task-actions should use .btn, .btn-success, .btn-danger, .btn-small from common.css in JSX */
+/* Example: <button className="btn btn-success btn-small">Complete</button> */
 
-.btn-toggle:hover {
-  background-color: #27ae60;
-}
-
-.btn-toggle.completed {
-  background-color: #3498db;
-}
-
-.btn-toggle.completed:hover {
-  background-color: #2980b9;
-}
-
-.btn-delete {
-  padding: 0.5rem 1rem;
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn-delete:hover {
-  background-color: #c0392b;
-}
-
-.no-tasks {
+.no-tasks, .loading-tasks {
   text-align: center;
-  color: #7f8c8d;
+  color: var(--text-light);
   padding: 2rem;
-  border: 1px dashed #ddd;
-  border-radius: 5px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius-medium, 8px);
   width: 100%;
   box-sizing: border-box;
+  margin-top: 1rem;
 }
 
 .loading-tasks {
-  text-align: center;
-  color: #3498db;
-  padding: 2rem;
-  border: 1px dashed #3498db;
-  border-radius: 5px;
-  animation: pulse 1.5s infinite;
+  color: var(--primary-color);
+  border-style: solid;
+}
+
+/* Task Breakdown Modal/View Styles */
+.task-breakdown-container {
+  /* This could be a modal or an inline section */
+  /* If modal, it would need modal-specific positioning, overlay, etc. */
+  /* For now, styling as a content card */
+  background-color: var(--card-background);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-large, 12px);
+  box-shadow: var(--shadow-lg, 0 8px 25px rgba(0,0,0,0.15));
+  margin-top: 2rem;
   width: 100%;
-  box-sizing: border-box;
+  max-width: 700px; /* Adjust as needed */
+  border: 1px solid var(--border-color);
 }
 
-@keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+.task-breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-@media (max-width: 1024px) {
-  .taskpage-header h1 {
-    font-size: 2rem;
-  }
+.task-breakdown-header h3 {
+  /* Should use .card-title or similar */
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.4rem;
+}
 
-  .taskpage-header p {
-    font-size: 1rem;
+.btn-close { /* Basic close button styling, can be enhanced */
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+}
+.btn-close:hover {
+  color: var(--danger-color);
+}
+
+.task-overall-progress {
+  margin-bottom: 1.5rem;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.progress-label span:first-child {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* .progress-bar-container and .progress-bar can reuse styles from above or be specific */
+
+.task-calendar { /* This is for the breakdown's mini-calendar */
+  display: flex; /* Changed to flex for horizontal scroll */
+  overflow-x: auto; /* Allow horizontal scrolling */
+  gap: 8px;
+  padding-bottom: 10px; /* Space for scrollbar */
+  margin-bottom: 1.5rem;
+}
+
+.task-calendar .calendar-day { /* Styles for individual days in the breakdown calendar */
+  min-width: 80px; /* Ensure days are not too squished */
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small, 4px);
+  background-color: var(--background-color);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.task-calendar .calendar-day:hover {
+  border-color: var(--primary-color);
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+}
+
+.task-calendar .calendar-day.selected {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.task-calendar .calendar-day.completed {
+  background-color: var(--secondary-color);
+  color: white;
+  border-color: var(--secondary-color);
+}
+
+.task-calendar .calendar-day.selected.completed {
+  background-color: color-mix(in srgb, var(--primary-color) 70%, var(--secondary-color) 30%);
+}
+
+
+.task-calendar .calendar-date .day-of-week {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-light);
+}
+.task-calendar .calendar-day.selected .calendar-date .day-of-week { color: rgba(255,255,255,0.8); }
+.task-calendar .calendar-day.completed .calendar-date .day-of-week { color: rgba(255,255,255,0.8); }
+
+
+.task-calendar .calendar-date .day-of-month {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.task-calendar .calendar-date .month {
+  font-size: 0.7rem;
+}
+
+.task-calendar .calendar-hours {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  color: var(--text-light);
+}
+.task-calendar .calendar-day.selected .calendar-hours,
+.task-calendar .calendar-day.completed .calendar-hours {
+ color: rgba(255,255,255,0.9);
+}
+
+
+.task-calendar .completion-indicator {
+  font-size: 1rem;
+  color: var(--secondary-color); /* Or white if on colored background */
+  margin-top: 5px;
+}
+.task-calendar .calendar-day.completed .completion-indicator {
+  color: white;
+}
+
+
+.task-breakdown-detail {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.task-breakdown-detail h4 {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.breakdown-info .label {
+  font-weight: bold;
+  color: var(--text-color);
+  margin-right: 0.5rem;
+}
+.breakdown-info .value {
+  color: var(--text-light);
+}
+.breakdown-info p.value { /* For multi-line summary */
+  margin-top: 0.25rem;
+  white-space: pre-wrap; /* Preserve line breaks in summary */
+}
+
+.breakdown-time, .breakdown-summary, .breakdown-status {
+  margin-bottom: 0.75rem;
+}
+
+.breakdown-completion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.breakdown-completion input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+.breakdown-completion label {
+  color: var(--text-light);
+  cursor: pointer;
+}
+
+.task-breakdown-stats {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.task-breakdown-stats .stat .label {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.task-breakdown-stats .stat .value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* Task breakdown view */
+.task-breakdown-view {
+  background-color: color-mix(in srgb, var(--card-background) 90%, var(--primary-color) 10%);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.task-breakdown-view h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+  padding-bottom: 0.5rem;
+}
+
+.breakdown-content {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.breakdown-content ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.breakdown-content li {
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .task-actions {
+    flex-direction: column;
+    width: 100%;
   }
   
-  .form-row {
+  .task-actions button {
+    width: 100%;
+  }
+  
+  .task-input-group {
     flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .form-input {
+    min-width: 100%;
+  }
+  
+  .task-form-container .d-flex {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .category-tabs {
+    flex-direction: column;
+  }
+  
+  .category-tab {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .btn {
+    width: 100%;
   }
 }
 
-@media (max-width: 768px) {
-  .taskpage-header h1 {
-    font-size: 1.8rem;
-  }
-
-  .taskpage-header p {
-    font-size: 0.9rem;
-  }
-
-  .task-categories {
-    flex-wrap: wrap;
-  }
-
-  .category-tab {
-    flex-basis: 45%;
-    margin-bottom: 0.5rem;
-  }
-
-  .task-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .task-actions {
-    width: 100%;
-    margin-top: 1rem;
-    justify-content: space-between;
-  }
+/* Ensure icon styles are applied if you use them (e.g., from an icon library) */
+.icon {
+  margin-right: 8px; /* Example */
 }

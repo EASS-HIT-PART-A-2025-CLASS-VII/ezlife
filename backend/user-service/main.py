@@ -1,15 +1,35 @@
 from fastapi import FastAPI, HTTPException, Depends, Form
-from pydantic import BaseModel
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from pymongo import MongoClient
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime
 import os
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-load_dotenv()
+import sys
+
+# Create a CryptContext instance for password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# OAuth2PasswordBearer for token authentication
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# Environment variable for JWT secret key
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Add the parent directory (backend) to sys.path to allow importing db.py and models.py
+# current_dir = os.path.dirname(os.path.abspath(__file__))
+# parent_dir = os.path.dirname(current_dir) # This should be the 'backend' directory
+# if parent_dir not in sys.path:
+# sys.path.append(parent_dir)
+
+from db import get_db, ConnectionFailure # Import get_db and ConnectionFailure from db.py
+from models import User # Import User from models.py
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')) # Load .env from backend directory
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -34,27 +54,22 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# MongoDB setup
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-client = MongoClient(MONGO_URI)
-db = client["task_management"]
-
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# MongoDB setup using get_db
+try:
+    db = get_db()
+    print("User service connected to DB successfully.")
+except ConnectionFailure as e:
+    print(f"CRITICAL: User service failed to connect to MongoDB: {e}")
+    raise
+except Exception as e:
+    print(f"CRITICAL: Unexpected error during user service DB setup: {e}")
+    raise
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
-
-# OAuth2 setup
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
-
-# User model
-class User(BaseModel):
-    email: str
-    password: str
 
 @app.post("/register")
 def register_user(user: User):

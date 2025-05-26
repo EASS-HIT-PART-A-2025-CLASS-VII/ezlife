@@ -1,3 +1,14 @@
+html {
+  box-sizing: border-box;
+  height: 100%; /* Ensure html element takes full viewport height */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 :root {
   --primary-color: #3498db;
   --secondary-color: #2ecc71;
@@ -10,7 +21,12 @@
   --border-color: #ddd;
   --shadow-color: rgba(0, 0, 0, 0.05);
   --hover-shadow: rgba(0, 0, 0, 0.1);
-  
+
+  /* Navbar related variables */
+  --navbar-height: 70px; /* Default height for desktop */
+  --navbar-padding-vertical: 1rem;
+  --navbar-padding-horizontal: 2rem;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -23,6 +39,33 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Media queries for responsive navbar height and padding */
+@media (max-width: 1024px) {
+  :root {
+    /* Estimated height for stacked brand + links:
+       Navbar padding-top (1rem) + Brand (1.5rem font ~28px) + Links margin-top (1rem) + Links (1rem font, possibly 1-2 rows) + Navbar padding-bottom (1rem)
+       Approx: 16px + 28px + 16px + (20px to 40px for links) + 16px = 96px to 116px.
+       Let's use 120px to be safe.
+    */
+    --navbar-height: 120px;
+    /* Padding remains the same as desktop unless specified */
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    /* Navbar.css had padding: 0.5rem 1rem for this breakpoint */
+    --navbar-padding-vertical: 0.5rem;
+    --navbar-padding-horizontal: 1rem;
+    /* Estimated height:
+       Padding (0.5rem*2) + Brand (1.2rem font ~22px) + Links margin (1rem) + Links (0.9rem font, possibly 1-2 rows)
+       Approx: 8px + 22px + 16px + (18px to 36px for links) + 8px = 72px to 90px.
+       Let's use 100px.
+    */
+    --navbar-height: 100px;
+  }
 }
 
 /* Theme definitions */
@@ -79,20 +122,28 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0; /* Explicitly set padding to 0 */
+  display: flex; 
+  flex-direction: column; 
+  min-height: 100vh; /* Use min-height on body */
   width: 100%;
-  transition: background-color 0.3s, color 0.3s;
   background-color: var(--background-color);
   color: var(--text-color);
+  font-family: var(--font-family, system-ui, Avenir, Helvetica, Arial, sans-serif); /* Ensure font-family is applied */
+  line-height: 1.5; /* Ensure line-height is applied */
+  font-weight: 400; /* Ensure font-weight is applied */
+  text-rendering: optimizeLegibility; /* Ensure text-rendering is applied */
+  -webkit-font-smoothing: antialiased; /* Ensure font-smoothing is applied */
+  -moz-osx-font-smoothing: grayscale; /* Ensure font-smoothing is applied */
+  font-synthesis: none; /* Ensure font-synthesis is applied */
+  transition: background-color 0.3s, color 0.3s; /* Keep transitions */
 }
 
 #root {
   width: 100%;
-  display: flex;
-  flex-direction: column;
+  display: flex; /* Make #root a flex container */
+  flex-direction: column; /* Stack its children (like App) vertically */
+  flex-grow: 1; /* Allow #root to grow and take available space in body */
 }
 
 h1 {

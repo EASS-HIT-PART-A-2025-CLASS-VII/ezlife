@@ -23,9 +23,23 @@ services:
       - backend
 
   user-service:
-    build: ./backend/user-service
+    build:
+      context: ./backend
+      dockerfile: user-service/Dockerfile # Path relative to the new context
+    env_file:
+      - ./.env # Add this line to specify the .env file
     container_name: user-service
     ports:
       - "8001:8001"
     environment:
       - MONGO_URI=mongodb+srv://ezlifedb:ezlifepassword@ezlife.tyhljcz.mongodb.net/?retryWrites=true&w=majority&appName=EZlife
+
+  task-estimation-service:
+    build: ./backend/task-estimation-service
+    container_name: task-estimation-service
+    ports:
+      - "8002:8002"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY} # Added for the new service
+    volumes:
+      - ./backend/task-estimation-service:/app # Optional: for development hot-reloading

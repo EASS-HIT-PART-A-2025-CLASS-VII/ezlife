@@ -1,11 +1,13 @@
 // App.jsx - Main Application
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import './App.css'; // Import App-specific styles
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import SettingsPage from './pages/SettingsPage';
 import TaskPage from './pages/TaskPage';
+import CalendarPage from './pages/CalendarPage'; // Import CalendarPage
 import Navbar from './pages/Navbar'; // Ensure Navbar is imported correctly
 import Footer from './pages/Footer'; // Import Footer component
 import api from './utils/api';
@@ -76,9 +78,18 @@ function App() {
     return api.post('/tasks', taskData)
       .then((response) => {
         console.log("Task added successfully with AI estimate:", response.data);
+        
+        // Format the task data correctly
+        const newTask = response.data;
+        
+        // Convert date strings to Date objects if needed
+        if (newTask.due_date && typeof newTask.due_date === 'string') {
+          newTask.due_date = new Date(newTask.due_date);
+        }
+        
         // Add new task to local state
-        setTasks([...tasks, response.data]);
-        return response.data; // Return the data for potential further handling
+        setTasks([...tasks, newTask]);
+        return newTask; // Return the data for potential further handling
       })
       .catch(error => {
         console.error("Error adding task:", error);
@@ -167,9 +178,16 @@ function App() {
                   onDeleteTask={handleDeleteTask}
                   onAddTask={handleAddTask}
                   isLoading={loading}
+                  onTaskUpdate={(updatedTask) => {
+                    // Update a task in the tasks array
+                    setTasks(tasks.map(task => 
+                      task.id === updatedTask.id ? updatedTask : task
+                    ));
+                  }}
                 /> : 
                 <Navigate to="/login" />
             } />
+            <Route path="/calendar" element={isAuthenticated ? <CalendarPage /> : <Navigate to="/login" />} />
             <Route path="*" element={<div>404 - Page Not Found</div>} /> {/* Fallback route */}
           </Routes>
         </div>

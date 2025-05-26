@@ -1,3 +1,5 @@
+/* body styles are now primarily handled by index.css */
+/*
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f5f7fa;
@@ -5,31 +7,35 @@ body {
   margin: 0;
   padding: 0;
 }
+*/
 
 .App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100%;
 }
 
 .content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  padding: 0; /* Remove padding as page-container already has padding */
 }
 
+/* Navbar styles can remain, but consider using variables from index.css */
 nav {
-  background-color: #2c3e50;
-  color: white;
+  background-color: var(--card-background); /* Example: use theme variable */
+  color: var(--text-color);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px var(--shadow-color); /* Example: use theme variable */
 }
 
 nav a {
-  color: white;
+  color: var(--text-color); /* Example: use theme variable */
   text-decoration: none;
   margin: 0 1rem;
   font-size: 1rem;
@@ -38,9 +44,11 @@ nav a {
 }
 
 nav a:hover {
-  color: #ecf0f1;
+  color: var(--primary-color); /* Example: use theme variable */
 }
 
+/* General button, input, ul, li, h1, h2 styles are now primarily handled by index.css and common.css */
+/*
 button {
   background: linear-gradient(90deg, #4CAF50, #45a049);
   color: white;
@@ -78,13 +86,17 @@ li {
 h1, h2 {
   color: #4CAF50;
 }
+*/
 
+/* #root styles are now primarily handled by index.css */
+/*
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
+*/
 
 .logo {
   height: 6em;
@@ -114,6 +126,8 @@ h1, h2 {
   }
 }
 
+/* Card styles can be replaced by .content-card from common.css or made more specific if needed */
+/*
 .card {
   background: white;
   border-radius: 8px;
@@ -144,25 +158,31 @@ h1, h2 {
 .card button:hover {
   background: #c0392b;
 }
+*/
 
 .read-the-docs {
-  color: #888;
+  color: #888; /* Consider using a theme variable, e.g., var(--text-light) */
 }
 
+/* .container can be replaced by .page-container or a more specific layout class */
+/*
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
 }
+*/
 
 .flex-center {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
+  /* height: 100vh; */ /* Avoid fixing height to 100vh if it's part of scrollable content */
 }
 
+/* .link can use global 'a' styles or be more specific */
+/*
 .link {
   color: #4CAF50;
   text-decoration: none;
@@ -173,7 +193,10 @@ h1, h2 {
 .link:hover {
   color: #45a049;
 }
+*/
 
+/* .hero styles can be component-specific or use common.css utilities */
+/*
 .hero {
   text-align: center;
   padding: 4rem 2rem;
@@ -208,7 +231,10 @@ h1, h2 {
   background: #3498db;
   color: white;
 }
+*/
 
+/* .task-card can be a specific component style or use .content-card from common.css */
+/*
 .task-card {
   background: white;
   border-radius: 8px;
@@ -243,3 +269,4 @@ h1, h2 {
 .task-card button:hover {
   background: #c0392b;
 }
+*/

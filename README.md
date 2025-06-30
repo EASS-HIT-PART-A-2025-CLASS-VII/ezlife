@@ -3,7 +3,7 @@
 *Streamline your productivity with AI-powered task estimation and seamless file management*
 
 ## 🎥 Demo Video
-*Video demonstration coming soon - [Add Your Video Link Here]*
+[*click here - [Add Your Video Link Here]*](https://youtu.be/arnBTleDFeU)
 
 ---
 

@@ -267,20 +267,6 @@ cd backend/user-service
 uvicorn main:app --port 8001 --reload
 ```
 
-## 🤝 Contributing
-
-We welcome contributions from the community! Whether it's bug fixes, feature enhancements, or documentation improvements, your input helps make EZlife better for everyone.
-
-### How to Contribute
-- Report bugs and suggest features via GitHub Issues
-- Submit pull requests for code improvements
-- Help improve documentation and user guides
-- Share feedback and usage experiences
-
----
-
-## 🙏 Acknowledgments
-
 Built with modern tools and frameworks that make development efficient and enjoyable:
 - **FastAPI** for the excellent Python web framework
 - **React** for the powerful frontend capabilities  

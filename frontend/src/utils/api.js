@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Create two separate API instances for different services
+// Create separate API instances for different services
 const authApi = axios.create({
   baseURL: "http://localhost:8001", // User-service for auth on port 8001
 });
@@ -8,6 +8,13 @@ const authApi = axios.create({
 const taskApi = axios.create({
   baseURL: "http://localhost:8000", // Main backend for tasks on port 8000
 });
+
+const fileApi = axios.create({
+  baseURL: "http://localhost:8003", // File-service for file operations on port 8003
+});
+
+// Note: Activities are now handled by the main backend (taskApi) on port 8000
+// No separate activities service needed
 
 // Add auth token to API requests if available
 const addAuthInterceptor = (axiosInstance) => {
@@ -47,9 +54,10 @@ const addAuthInterceptor = (axiosInstance) => {
   );
 }
 
-// Apply interceptor to both instances
+// Apply interceptor to all instances
 addAuthInterceptor(taskApi);
 addAuthInterceptor(authApi);
+addAuthInterceptor(fileApi);
 
 // Helper function to handle API errors
 const handleApiError = (error) => {
@@ -65,20 +73,54 @@ const handleApiError = (error) => {
 
 // Combined API object with methods that route to the appropriate service
 const api = {
-  // Auth methods go to the auth service
+  // Route requests to the appropriate service
   post: (url, data, config) => {
     if (url === '/token') {
       console.log('Sending auth request to user-service on port 8001');
       return authApi.post(url, data, config).catch(handleApiError);
+    } else if (url === '/upload' || url.startsWith('/files')) {
+      console.log('Sending file request to file-service on port 8003');
+      return fileApi.post(url, data, config).catch(handleApiError);
+    } else if (url.startsWith('/activities')) {
+      console.log('Sending activities request to main backend on port 8000');
+      return taskApi.post(url, data, config).catch(handleApiError);
     } else {
       return taskApi.post(url, data, config).catch(handleApiError);
     }
   },
   
-  // Task methods go to the task service
-  get: (url, config) => taskApi.get(url, config).catch(handleApiError),
+  get: (url, config) => {
+    if (url.startsWith('/files')) {
+      console.log('Sending file request to file-service on port 8003');
+      return fileApi.get(url, config).catch(handleApiError);
+    } else if (url.startsWith('/activities')) {
+      console.log('Sending activities request to main backend on port 8000');
+      return taskApi.get(url, config).catch(handleApiError);
+    } else {
+      return taskApi.get(url, config).catch(handleApiError);
+    }
+  },
+  
   patch: (url, data, config) => taskApi.patch(url, data, config).catch(handleApiError),
-  delete: (url, config) => taskApi.delete(url, config).catch(handleApiError)
+  
+  delete: (url, config) => {
+    if (url.startsWith('/files')) {
+      console.log('Sending file delete request to file-service on port 8003');
+      return fileApi.delete(url, config).catch(handleApiError);
+    } else if (url.startsWith('/activities')) {
+      console.log('Sending activities delete request to main backend on port 8000');
+      return taskApi.delete(url, config).catch(handleApiError);
+    } else {
+      return taskApi.delete(url, config).catch(handleApiError);
+    }
+  },
+  
+  // Add baseURLs for direct access
+  defaults: {
+    baseURL: taskApi.defaults.baseURL,
+    authBaseURL: authApi.defaults.baseURL,
+    fileBaseURL: fileApi.defaults.baseURL
+  }
 };
 
 export default api;

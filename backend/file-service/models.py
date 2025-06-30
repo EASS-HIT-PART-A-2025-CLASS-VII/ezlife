@@ -3,12 +3,10 @@ from typing import Optional, List, Dict
 from datetime import datetime
 
 class TaskBreakdown(BaseModel):
-    day: Optional[str] = None
+    day: str
     date: Optional[str] = None
-    hours: Optional[float] = None
-    step: Optional[str] = None
+    hours: float
     summary: Optional[str] = None
-    percentage: Optional[int] = None
     completed: bool = False
 
 class Task(BaseModel):
@@ -18,17 +16,10 @@ class Task(BaseModel):
     due_date: Optional[datetime] = None
     days_per_week: Optional[int] = None
     hours_per_day: Optional[float] = None
-    breakdown: Optional[List[Dict]] = None  
-    progress: Optional[float] = 0  
+    breakdown: Optional[List[TaskBreakdown]] = None
+    progress: Optional[float] = 0  # Percentage of completion (0-100)
 
 class User(BaseModel):
     email: EmailStr
     password: str
     created_at: Optional[datetime] = None
-    
-class Activity(BaseModel):
-    id: Optional[str] = None
-    name: str
-    time: str
-    date: str
-    user_id: Optional[str] = None

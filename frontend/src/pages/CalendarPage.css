@@ -1,5 +1,89 @@
 /* @import '../styles/common.css'; */ /* Removed: common.css is imported in main.jsx */
 
+/* Connection Status Indicator */
+.connection-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1002;
+  background-color: var(--card-background);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.connection-status.online {
+  border-color: var(--success-color, #27ae60);
+  background-color: color-mix(in srgb, var(--success-color, #27ae60) 5%, var(--card-background));
+}
+
+.connection-status.offline {
+  border-color: var(--warning-color, #f39c12);
+  background-color: color-mix(in srgb, var(--warning-color, #f39c12) 5%, var(--card-background));
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-light);
+}
+
+.connection-status.online .status-indicator {
+  background-color: var(--success-color, #27ae60);
+  animation: pulse 2s infinite;
+}
+
+.connection-status.offline .status-indicator {
+  background-color: var(--warning-color, #f39c12);
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.status-text {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+/* Connection status indicator */
+.connection-status {
+  text-align: center;
+  padding: 0.75rem 1rem;
+  margin: 1rem auto;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  max-width: 600px;
+  transition: all 0.3s ease;
+}
+
+.connection-status.online {
+  background-color: rgba(39, 174, 96, 0.1);
+  border: 1px solid rgba(39, 174, 96, 0.3);
+  color: #27ae60;
+}
+
+.connection-status.offline {
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+}
+
+.error-indicator {
+  color: #f39c12;
+  font-weight: normal;
+}
+
 .calendarpage-container {
   /* Extend page-container from common.css with specific calendar page styles */
   background-color: var(--background-color);
@@ -27,6 +111,7 @@
   margin: 0 auto 3rem;
   border-radius: 8px;
   box-shadow: 0 2px 10px var(--shadow-color);
+  overflow-x: hidden; /* Prevent horizontal overflow */
   /* Remove temporary debug border */
 }
 
@@ -131,12 +216,32 @@
   border-collapse: collapse;
   box-shadow: 0 3px 10px var(--shadow-color);
   border-radius: 0 0 5px 5px;
+  max-width: 100%; /* Ensure container respects parent width */
+  overflow: hidden; /* Prevent grid overflow */
+}
+
+.more-items-indicator {
+  padding: 2px 6px;
+  margin-top: 2px;
+  background-color: var(--text-light);
+  color: var(--card-background);
+  font-size: 0.6rem;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.more-items-indicator:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
 /* Calendar day cell - matching the clean layout in the reference image */
 .calendar-grid .calendar-day {
-  aspect-ratio: 1;
-  min-height: 100px;
+  height: 120px;
+  min-width: 0; /* Allow the grid layout to determine the width */
   border-right: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
   padding: 10px;
@@ -145,6 +250,9 @@
   flex-direction: column;
   position: relative;
   transition: all 0.2s;
+  cursor: pointer; /* Make the calendar day clickable */
+  overflow: hidden; /* Prevent content from causing cell expansion */
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .calendar-day:nth-child(7n) {
@@ -153,6 +261,10 @@
 
 .calendar-day:hover {
   background-color: var(--background-color);
+}
+
+.calendar-day.selected {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-background));
 }
 
 .calendar-day.empty {
@@ -176,21 +288,67 @@
 
 .tasks-on-day {
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal overflow */
   flex-grow: 1;
   font-size: 0.75rem;
   max-height: 70px;
+  width: 100%; /* Ensure it takes the full width of the container */
   margin-top: 4px;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Add some space between items */
+  contain: layout paint; /* Improve performance and containment */
+}
+
+/* Activity count button styling */
+.activity-count-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 6px 8px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.activity-count-button:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* This ensures that even with RTL text content, the layout doesn't break */
+.calendar-task-item-wrapper,
+.calendar-activity-item-wrapper {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin-bottom: 4px;
+  position: relative; /* Ensure proper containment */
+  display: block; /* Force block display */
+  contain: layout paint; /* Improve performance and containment */
+  isolation: isolate; /* Create a new stacking context */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
 }
 
 .calendar-task-item {
   padding: 4px 8px;
   margin-bottom: 4px;
   color: var(--text-color);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap; /* Keep on one line, force horizontal scroll */
+  overflow-x: auto; /* Add horizontal scrollbar when needed */
+  overflow-y: hidden; /* No vertical scrolling */
   font-size: 0.7rem;
   transition: all 0.2s;
   border-left: 2px solid var(--primary-color);
@@ -198,12 +356,95 @@
   border-radius: 0 2px 2px 0;
   box-shadow: 0 1px 2px var(--shadow-color);
   cursor: pointer;
+  max-width: 100%; /* Ensure it doesn't expand beyond its container */
+  width: calc(100% - 4px); /* Ensure consistent width */
+  box-sizing: border-box; /* Include padding in the width calculation */
+  display: flex; /* Use flexbox for better layout control */
+  align-items: center; /* Center items vertically */
+  height: 22px; /* Fixed height for consistent appearance */
+  position: relative; /* For RTL positioning */
+  text-align: start; /* Ensure proper text alignment */
+}
+.calendar-activity-item {
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  color: var(--text-color);
+  white-space: nowrap; /* Keep on one line, force horizontal scroll */
+  overflow-x: auto; /* Add horizontal scrollbar when needed */
+  overflow-y: hidden; /* No vertical scrolling */
+  font-size: 0.7rem;
+  transition: all 0.2s;
+  border-left: 2px solid var(--accent-color);
+  background-color: color-mix(in srgb, var(--accent-color) 5%, var(--card-background));
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 1px 2px var(--shadow-color);
+  cursor: pointer;
+  max-width: 100%; /* Ensure it doesn't expand beyond its container */
+  width: calc(100% - 4px); /* Account for the border */
+  box-sizing: border-box; /* Include padding in the width calculation */
+  display: flex; /* Use flexbox for better layout control */
+  align-items: center; /* Center items vertically */
+  height: 22px; /* Fixed height for consistent appearance */
+  position: relative; /* For RTL positioning */
+  text-align: start; /* Ensure proper text alignment */
 }
 
 .calendar-task-item:hover {
   color: var(--text-color);
   background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-background));
   transform: translateX(2px);
+}
+
+.task-time {
+  font-weight: bold;
+  margin-right: 4px;
+  flex-shrink: 0; /* Prevent time from shrinking */
+  min-width: 35px; /* Ensure consistent space for time */
+}
+
+/* For RTL layouts, adjust margins */
+.calendar-task-item:has(span[dir="auto"][lang="he"]) .task-time {
+  margin-right: 0;
+  margin-left: 4px;
+}
+
+.task-title {
+  white-space: nowrap; /* Keep on one line */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+  max-width: calc(100% - 40px); /* Leave space for the time */
+  flex: 1; /* Allow title to take remaining space */
+  display: inline-block; /* Better for text overflow ellipsis */
+  padding: 0 2px; /* Small padding for better readability */
+}
+
+.calendar-activity-item:hover {
+  color: var(--text-color);
+  background-color: color-mix(in srgb, var(--accent-color) 10%, var(--card-background));
+  transform: translateX(2px);
+}
+
+.activity-time {
+  font-weight: bold;
+  margin-right: 4px;
+  flex-shrink: 0; /* Prevent time from shrinking */
+  min-width: 35px; /* Ensure consistent space for time */
+}
+
+/* For RTL layouts, adjust margins */
+.calendar-activity-item:has(span[dir="auto"][lang="he"]) .activity-time {
+  margin-right: 0;
+  margin-left: 4px;
+}
+
+.activity-title {
+  white-space: nowrap; /* Keep on one line */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+  flex: 1; /* Allow title to take remaining space */
+  max-width: calc(100% - 40px); /* Leave space for the time */
+  display: inline-block; /* Better for text overflow ellipsis */
+  padding: 0 2px; /* Small padding for better readability */
 }
 
 /* Schedule section */
@@ -242,13 +483,22 @@
 
 .add-activity-form input {
   flex: 1;
-  min-width: 200px;
+  min-width: 150px;
   padding: 0.8rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   background-color: var(--card-background);
   color: var(--text-color);
+}
+
+.add-activity-form input[type="date"] {
+  min-width: 150px;
+  padding: 0.7rem 1rem;
+}
+
+.add-activity-form input[type="time"] {
+  min-width: 120px;
 }
 
 .add-activity-form input:focus {
@@ -272,6 +522,7 @@
   background-color: var(--card-background);
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   transition: transform 0.2s;
+  width: 100%;
 }
 
 .activity-item:hover {
@@ -280,9 +531,20 @@
   border-color: var(--primary-color);
 }
 
-.activity-item span {
+.activity-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* Important for text overflow to work */
+  margin-right: 1rem;
+}
+
+.activity-name {
   font-size: 1.1rem;
   color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .activity-item strong {
@@ -312,6 +574,117 @@
 /* Current day highlight - subtle highlight */
 .calendar-day.today {
   background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* Add support for bidirectional text */
+.calendar-task-item,
+.calendar-activity-item,
+.activity-title,
+.task-title,
+.activity-name {
+  unicode-bidi: plaintext; /* Better handling of bidirectional text */
+}
+
+/* Scrollbar styling for better usability */
+.tasks-on-day::-webkit-scrollbar,
+.calendar-task-item::-webkit-scrollbar,
+.calendar-activity-item::-webkit-scrollbar,
+.task-title::-webkit-scrollbar,
+.activity-title::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.tasks-on-day::-webkit-scrollbar-track,
+.calendar-task-item::-webkit-scrollbar-track,
+.calendar-activity-item::-webkit-scrollbar-track,
+.task-title::-webkit-scrollbar-track,
+.activity-title::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tasks-on-day::-webkit-scrollbar-thumb,
+.calendar-task-item::-webkit-scrollbar-thumb,
+.calendar-activity-item::-webkit-scrollbar-thumb,
+.task-title::-webkit-scrollbar-thumb,
+.activity-title::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.tasks-on-day::-webkit-scrollbar-thumb:hover,
+.calendar-task-item::-webkit-scrollbar-thumb:hover,
+.calendar-activity-item::-webkit-scrollbar-thumb:hover,
+.task-title::-webkit-scrollbar-thumb:hover,
+.activity-title::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Better handling for bidirectional text */
+.calendar-task-item,
+.calendar-activity-item,
+.activity-title,
+.task-title,
+.activity-name {
+  unicode-bidi: plaintext;
+  direction: ltr; /* Default direction */
+  max-width: 100%; /* Ensure it doesn't expand beyond its container */
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
+/* RTL specific adjustments */
+span[dir="auto"][lang="he"].task-title,
+span[dir="auto"][lang="he"].activity-title {
+  text-align: right;
+  direction: rtl;
+  padding-right: 4px;
+  max-width: calc(100% - 45px); /* Ensure text stays within container */
+}
+
+/* Adjust for RTL items - fix border handling */
+.calendar-task-item:has(span[dir="auto"][lang="he"]) {
+  border-left: none;
+  border-right: 2px solid var(--primary-color);
+  border-radius: 2px 0 0 2px;
+  padding-right: 4px;
+  flex-direction: row-reverse; /* Reverse the flex direction for RTL */
+}
+
+.calendar-activity-item:has(span[dir="auto"][lang="he"]) {
+  border-left: none;
+  border-right: 2px solid var(--accent-color);
+  border-radius: 2px 0 0 2px;
+  padding-right: 4px;
+  flex-direction: row-reverse; /* Reverse the flex direction for RTL */
+}
+
+/* Specific styling for the activity-name in RTL mode */
+.activity-name[dir="auto"][lang="he"] {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Fallback classes for browsers that don't support :has() */
+.rtl-content {
+  border-left: none !important;
+  border-right: 2px solid var(--primary-color) !important;
+  border-radius: 2px 0 0 2px !important;
+  padding-right: 4px !important;
+  flex-direction: row-reverse !important;
+}
+
+.rtl-content.calendar-activity-item {
+  border-right-color: var(--accent-color) !important;
+}
+
+.rtl-content .task-time,
+.rtl-content .activity-time {
+  margin-right: 0 !important;
+  margin-left: 4px !important;
+}
+
+.rtl-item .activity-name {
+  text-align: right;
+  direction: rtl;
 }
 
 .calendar-day.today .day-number {
@@ -388,5 +761,315 @@
   
   .month-year-title {
     font-size: 1.5rem;
+  }
+}
+
+/* Modal styling for activities */
+.activities-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.activities-modal {
+  position: fixed;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: calc(100% - 40px);
+  width: 500px;
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  transition: all 0.3s ease-in-out;
+  top: 50% !important;
+  left: 50% !important;
+  border: 1px solid var(--border-color);
+}
+
+.activities-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.activities-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--text-color);
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-light);
+  transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+  color: var(--danger-color);
+}
+
+.activities-modal-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 250px);
+}
+
+.modal-activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  transition: background-color 0.15s;
+}
+
+.modal-activity-item:hover {
+  background-color: var(--hover-color);
+}
+
+.modal-activity-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modal-activity-time {
+  font-weight: 600;
+  color: var(--text-dark);
+  min-width: 60px;
+}
+
+.modal-activity-name {
+  color: var(--text-color);
+  word-break: break-word;
+}
+
+.no-activities-message {
+  text-align: center;
+  color: var(--text-light);
+  padding: 2rem 0;
+}
+
+.activities-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Modal positioning and responsiveness */
+.activities-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.activities-modal {
+  position: fixed;
+  background-color: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: calc(100% - 40px);
+  width: 500px;
+  max-height: calc(100vh - 100px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+  border: 1px solid var(--border-color);
+  transform: translate(-50%, -50%);
+  top: 50% !important;
+  left: 50% !important;
+}
+
+.activities-modal.mobile-centered {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 95% !important;
+  max-width: 400px !important;
+  max-height: 85vh !important;
+}
+
+.activities-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--background-color);
+}
+
+.activities-modal-header h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  background-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.activities-modal-content {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: calc(85vh - 200px);
+}
+
+.modal-activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background-color: var(--background-color);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.modal-activity-item:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-activity-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-grow: 1;
+  margin-right: 1rem;
+}
+
+.modal-activity-time {
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+}
+
+.modal-activity-name {
+  color: var(--text-color);
+  font-size: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  line-height: 1.4;
+}
+
+.sync-status {
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+}
+
+.sync-status.pending {
+  color: var(--warning-color, #f39c12);
+}
+
+.sync-status.synced {
+  color: var(--success-color, #27ae60);
+}
+
+.no-activities-message {
+  text-align: center;
+  color: var(--text-light);
+  font-style: italic;
+  margin: 2rem 0;
+}
+
+.activities-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive modal adjustments */
+@media (max-width: 768px) {
+  .activities-modal {
+    width: 95%;
+    max-width: 400px;
+    max-height: 85vh;
+  }
+  
+  .activities-modal-content {
+    max-height: calc(85vh - 150px);
+    padding: 1rem;
+  }
+  
+  .modal-activity-details {
+    margin-right: 0.5rem;
+  }
+  
+  .modal-activity-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .modal-activity-details {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .activities-modal-header h3 {
+    font-size: 1rem;
+  }
+  
+  .activities-modal-content {
+    padding: 0.75rem;
+  }
+  
+  .modal-activity-item {
+    padding: 0.75rem;
+    align-items: flex-start;
+    gap: 0.3rem;
   }
 }

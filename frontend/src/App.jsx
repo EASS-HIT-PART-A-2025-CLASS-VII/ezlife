@@ -8,6 +8,7 @@ import RegisterPage from './pages/RegisterPage';
 import SettingsPage from './pages/SettingsPage';
 import TaskPage from './pages/TaskPage';
 import CalendarPage from './pages/CalendarPage'; // Import CalendarPage
+import FilesPage from './pages/FilesPage'; // Import FilesPage
 import Navbar from './pages/Navbar'; // Ensure Navbar is imported correctly
 import Footer from './pages/Footer'; // Import Footer component
 import api from './utils/api';
@@ -26,6 +27,7 @@ function App() {
   // Fetch tasks when authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      console.log('User is authenticated, token:', localStorage.getItem('authToken')?.substring(0, 10) + '...');
       fetchTasks();
     }
   }, [isAuthenticated]);
@@ -169,8 +171,7 @@ function App() {
             } />
             <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/settings" element={isAuthenticated ? <SettingsPage onThemeChange={handleThemeChange} /> : <Navigate to="/" />} />
-            <Route path="/tasks" element={
+            <Route path="/settings" element={isAuthenticated ? <SettingsPage onThemeChange={handleThemeChange} /> : <Navigate to="/" />} />            <Route path="/tasks" element={
               isAuthenticated ? 
                 <TaskPage 
                   tasks={tasks}
@@ -188,6 +189,7 @@ function App() {
                 <Navigate to="/login" />
             } />
             <Route path="/calendar" element={isAuthenticated ? <CalendarPage /> : <Navigate to="/login" />} />
+            <Route path="/files" element={isAuthenticated ? <FilesPage /> : <Navigate to="/login" />} />
             <Route path="*" element={<div>404 - Page Not Found</div>} /> {/* Fallback route */}
           </Routes>
         </div>

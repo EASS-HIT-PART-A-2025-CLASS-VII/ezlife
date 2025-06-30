@@ -1,0 +1,159 @@
+/* FilesPage.css - Styling for the Files Management Page */
+
+.files-page-content {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Upload Form Styling */
+.upload-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.upload-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upload-form input[type="file"] {
+  padding: 0.8rem;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  background-color: var(--card-background);
+  transition: all 0.3s;
+}
+
+.upload-form input[type="file"]:hover {
+  border-color: var(--primary-color);
+  background-color: color-mix(in srgb, var(--primary-color) 5%, var(--card-background));
+}
+
+/* Files Table Styling */
+.files-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.files-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.files-table th,
+.files-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.files-table th {
+  background-color: var(--background-color);
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.files-table tr:last-child td {
+  border-bottom: none;
+}
+
+.files-table tr:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 5%, var(--card-background));
+}
+
+/* File Icons */
+.file-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.image-icon {
+  color: #4CAF50;
+}
+
+.pdf-icon {
+  color: #F44336;
+}
+
+.text-icon {
+  color: #2196F3;
+}
+
+.file-type-cell {
+  text-align: center;
+}
+
+/* Action Buttons */
+.actions-cell {
+  white-space: nowrap;
+  text-align: center;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0 0.25rem;
+  transition: all 0.2s;
+}
+
+.btn-download {
+  color: var(--primary-color);
+}
+
+.btn-download:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-background));
+}
+
+.btn-delete {
+  color: var(--danger-color);
+}
+
+.btn-delete:hover {
+  background-color: color-mix(in srgb, var(--danger-color) 10%, var(--card-background));
+}
+
+/* Status Messages */
+.no-files-message {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .files-table th,
+  .files-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .files-table th:nth-child(3),
+  .files-table td:nth-child(3) {
+    display: none; /* Hide description column on mobile */
+  }
+  
+  .file-icon {
+    font-size: 1.2rem;
+  }
+}

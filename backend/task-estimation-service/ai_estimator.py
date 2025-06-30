@@ -12,22 +12,30 @@ from breakdown_utils import generate_simple_breakdown  # Import the new utility
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file in parent backend directory
+dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+print(f"Loading .env from: {dotenv_path}")
+print(f"Path exists: {os.path.exists(dotenv_path)}")
+load_dotenv(dotenv_path=dotenv_path)
 
 # OpenRouter API Configuration
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+print(f"OPENROUTER_API_KEY loaded: {'Yes' if OPENROUTER_API_KEY else 'No'}")
+if OPENROUTER_API_KEY:
+    print(f"API Key starts with: {OPENROUTER_API_KEY[:10]}...")
 
 if not OPENROUTER_API_KEY:
     logging.warning("OPENROUTER_API_KEY not found in environment variables. AI estimator will likely fail.")
 
 # Available models to try in order (fallback mechanism)
 AVAILABLE_MODELS = [
-    "mistralai/mistral-7b-instruct",  # First choice - Mistral 7B Instruct
-    "google/palm-2-chat-bison",        # Second choice - Palm 2
-    "anthropic/claude-instant-v1",     # Third choice - Claude Instant
-    "openai/gpt-3.5-turbo"             # Last resort - GPT 3.5 (uses credits)
+    "microsoft/wizardlm-2-8x22b",      # First choice - Free and powerful
+    "meta-llama/llama-3.1-8b-instruct", # Second choice - Llama 3.1
+    "mistralai/mistral-7b-instruct",   # Third choice - Mistral 7B Instruct
+    "google/gemma-2-9b-it",            # Fourth choice - Gemma 2
+    "anthropic/claude-3-haiku"         # Last resort - Claude (uses credits)
 ]
 
 # Headers required for OpenRouter API
@@ -43,11 +51,53 @@ def get_time_estimate(description: str, model: str) -> int:
     """
     Helper function to get time estimate from a specific model
     """
-    # System prompt to guide the model's response format
-    system_prompt = "You are a task time estimation assistant. Respond ONLY with a numerical estimate in minutes for how long the task would take an average person. Give a single number only, no explanations or additional text."
+    # Enhanced system prompt for beginner-level estimation with overhead
+    system_prompt = """You are an expert task time estimation assistant specialized in estimating realistic time requirements for BEGINNERS.
+
+    ESTIMATION PRINCIPLES:
+    1. Always estimate for someone who is a BEGINNER at the task
+    2. Include realistic overhead for learning, mistakes, and iterations
+    3. Account for the extra time beginners need compared to experts
+    4. Consider real-world challenges and setbacks
+
+    OVERHEAD CALCULATION GUIDELINES:
+    - For learning tasks: Add 30-50% overhead for trial and error
+    - For technical tasks: Add 40-60% overhead for debugging and troubleshooting
+    - For creative tasks: Add 25-40% overhead for iterations and refinements
+    - For complex multi-step tasks: Add 50-70% overhead for coordination and planning
+    - For completely new skills: Add 60-80% overhead for foundational learning
+
+    BEGINNER FACTORS TO CONSIDER:
+    - Time to understand concepts and terminology
+    - Research time to find resources and tutorials
+    - Setup and configuration difficulties
+    - Common beginner mistakes and debugging time
+    - Multiple attempts to get things working
+    - Time to ask for help and find solutions
+    - Practice time to build confidence
+    - Documentation reading and understanding
+
+    REALISTIC TIME EXAMPLES:
+    - "learn basic HTML" → 720 minutes (12 hours with beginner overhead)
+    - "learn Python programming basics" → 4800 minutes (80 hours for true beginner)
+    - "build first simple website" → 2400 minutes (40 hours including learning and debugging)
+    - "write first business plan" → 1800 minutes (30 hours with research and revisions)
+    - "learn to use Excel" → 960 minutes (16 hours with practice and mistakes)
+
+    IMPORTANT: Respond with ONLY a number representing minutes. No text, no explanations, just the number.
+    Be generous with time estimates - it's better to overestimate than leave someone frustrated.
+    """
     
-    # User prompt with the task description
-    user_prompt = f"How many minutes would it take to complete this task: {description}"
+    # User prompt with task description and beginner context
+    user_prompt = f"""Task: {description}
+
+Please estimate how many minutes this task would take for a COMPLETE BEGINNER, including:
+- Learning time for any required skills
+- Time for mistakes, troubleshooting, and iterations
+- Appropriate overhead for inexperience
+- Setup and preparation time
+
+Provide only the number of minutes."""
     
     # Prepare payload for OpenRouter API (following OpenAI format)
     payload = {
@@ -56,19 +106,17 @@ def get_time_estimate(description: str, model: str) -> int:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "temperature": 0.1,  # Low temperature for more consistent responses
-        "max_tokens": 10     # We only need a small number
+        "temperature": 0.3,  # Slightly higher for more realistic variation
+        "max_tokens": 100    # Increased to allow for longer responses and reasoning
     }
     
     logging.info(f"Requesting estimation from model: {model} for task: '{description[:50]}...'")
     
     try:
-        # Make API request
-        response = requests.post(OPENROUTER_API_URL, headers=headers, json=payload, timeout=15)  # Increased timeout
+        response = requests.post(OPENROUTER_API_URL, headers=headers, json=payload, timeout=15) 
         
         if response.status_code == 200:
             result = response.json()
-            # Extract the response text from the completion
             text = result.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
             logging.info(f"Raw response from {model}: {text}")
             
@@ -76,10 +124,10 @@ def get_time_estimate(description: str, model: str) -> int:
             digits = ''.join(filter(str.isdigit, text))
             if digits:
                 minutes = int(digits)
-                # Sanity check - if estimate is absurdly high, cap it
-                if minutes > 1440 * 3:  # More than 3 days in minutes
-                    logging.warning(f"Absurdly high estimate ({minutes} min) from {model} capped to 120 min.")
-                    minutes = 120    # Cap at 2 hours
+                # Sanity check - if estimate is absurdly high, cap it (for beginners, allow up to 2 weeks)
+                if minutes > 1440 * 14:  # More than 2 weeks in minutes (20,160 minutes)
+                    logging.warning(f"Extremely high estimate ({minutes} min) from {model} capped to reasonable maximum.")
+                    minutes = 1440 * 7  # Cap at 1 week (10,080 minutes)
                 return minutes
             else:
                 logging.warning(f"No digits found in response from {model}: '{text}'")
@@ -106,7 +154,6 @@ def get_task_breakdown(description: str, total_minutes: int, days_per_week: int,
     """
     logging.info(f"Generating AI task breakdown for: '{description[:50]}...' ({total_minutes} min)")
     
-    # Validate inputs before proceeding
     if not all([isinstance(days_per_week, (int, float)), days_per_week > 0,
                 isinstance(hours_per_day, (int, float)), hours_per_day > 0,
                 isinstance(total_minutes, (int, float)), total_minutes > 0]):
@@ -119,31 +166,54 @@ def get_task_breakdown(description: str, total_minutes: int, days_per_week: int,
     effective_total_days_needed = max(0.1, total_hours_needed / hours_per_day)  # Ensure total_days_needed is at least 0.1
     days_needed = max(1, round(effective_total_days_needed))
     
-    # System prompt for task breakdown
-    system_prompt = """You are a task planning assistant. Break down the given task into daily chunks with specific
-    summaries of what should be done each day. Format your response as JSON with the following structure:
+    # System prompt for task breakdown - beginner focused
+    system_prompt = """You are a task planning assistant specializing in breaking down tasks for BEGINNERS.
+
+    IMPORTANT: Your response must be valid JSON array format. Start with [ and end with ]. Each object must have "step", "percentage", and "summary" fields.
+
+    Format your response exactly like this:
     [
-        {"day": "Day 1", "hours": hours_for_day_1, "summary": "specific subtasks for day 1"},
-        {"day": "Day 2", "hours": hours_for_day_2, "summary": "specific subtasks for day 2"}
+        {"step": "Step 1: Learning Basics", "percentage": 25, "summary": "Research fundamentals, understand terminology, and gather learning resources"},
+        {"step": "Step 2: Setup & Preparation", "percentage": 20, "summary": "Install tools, configure environment, and prepare workspace"},
+        {"step": "Step 3: Initial Practice", "percentage": 30, "summary": "Follow tutorials, practice basic concepts, make and fix beginner mistakes"},
+        {"step": "Step 4: Implementation", "percentage": 20, "summary": "Apply learned skills to complete the actual task"},
+        {"step": "Step 5: Review & Polish", "percentage": 5, "summary": "Test, debug, refine, and finalize the work"}
     ]
     
-    The hours should add up to the total hours needed for the task, and be distributed according to the hours_per_day limit.
-    Each summary should be detailed, specific and actionable - describing concrete subtasks to work on, milestones to accomplish,
-    and specific outcomes expected for that day's work. Be practical and realistic about what can be accomplished in the given time.
+    BEGINNER-FOCUSED BREAKDOWN RULES:
+    - Always include learning/research phases for beginners
+    - Account for setup and configuration challenges
+    - Include time for practice and making mistakes
+    - Add troubleshooting and debugging steps
+    - Provide 3-6 logical steps that make sense for a complete beginner
+    - The percentage should add up to 100% and represent the proportion of total time
+    - Each summary should describe beginner-friendly activities
+    - Be specific to the actual task described
+    - Focus on learning progression and skill building
+    - Return ONLY the JSON array, no other text
     
-    Consider the logical progression of the task - what needs to be done first, what depends on earlier work, and how to sequence
-    the work efficiently. Include appropriate time for planning, review, and any necessary communication or coordination.
+    Examples:
+    - For "learn coding": Planning (research languages, set up environment), Practice (tutorials, exercises), Projects (build applications)
+    - For "plan party": Planning (guest list, venue, budget), Preparation (book venue, order supplies), Execution (setup, host event)
+    - For "write report": Research (gather data, analyze), Writing (draft sections, compile), Review (edit, format, finalize)
     """
     
-    # User prompt with task details
+    # User prompt with task details - beginner focused
     user_prompt = f"""
     Task description: {description}
-    Total estimated hours: {total_hours_needed:.1f} hours
-    Days per week: {days_per_week}
-    Hours per day: {hours_per_day}
+    Total estimated time: {total_hours_needed:.1f} hours ({total_minutes} minutes)
+    Target audience: COMPLETE BEGINNER
     
-    Break this down into {days_needed} days of work, with each day having at most {hours_per_day} hours.
-    Make sure the summaries are specific to the task described.
+    Break this task down into 3-6 logical steps/phases for someone who has never done this before.
+    Include learning phases, setup steps, practice time, and troubleshooting.
+    Make sure the summaries are specific to the actual task: "{description}"
+    The percentages should add up to 100%.
+    Consider that beginners need extra time for:
+    - Understanding concepts and terminology
+    - Setting up tools and environments
+    - Making and fixing mistakes
+    - Following tutorials and guides
+    - Asking for help and research
     """
     
     # Prepare payload for OpenRouter API
@@ -168,23 +238,50 @@ def get_task_breakdown(description: str, total_minutes: int, days_per_week: int,
             
             try:
                 import re
+                
+                # First, try to find a JSON array in the response
                 json_match = re.search(r'\[\s*(?:\{.*?\}\s*,?\s*)*\]', text, re.DOTALL)
                 if json_match:
                     json_str = json_match.group(0)
                 else:
+                    # Clean up the response text and try to fix common JSON issues
                     json_str = text.strip().lstrip("```json").rstrip("```").strip()
-                    if not (json_str.startswith('[') and json_str.endswith(']')):
-                        logging.warning(f"Could not extract a clear JSON array from {model} response. Attempting to parse as is.")
+                    
+                    # If response doesn't start with [, try to wrap it as an array
+                    if not json_str.startswith('['):
+                        # Try to find individual step objects and wrap them in an array
+                        if '{' in json_str and '}' in json_str:
+                            # Split by closing brace followed by comma and try to fix
+                            parts = re.split(r'\},\s*(?=\{|")', json_str)
+                            fixed_parts = []
+                            for i, part in enumerate(parts):
+                                part = part.strip()
+                                if part:
+                                    # Ensure part starts with {
+                                    if not part.startswith('{'):
+                                        part = '{' + part
+                                    # Ensure part ends with }
+                                    if not part.endswith('}'):
+                                        part = part + '}'
+                                    # Fix missing "step" key by adding it if needed
+                                    if '"step"' not in part and '"Step' in part:
+                                        part = part.replace('"Step', '"step": "Step')
+                                    fixed_parts.append(part)
+                            json_str = '[' + ','.join(fixed_parts) + ']'
+                        else:
+                            logging.warning(f"Could not extract a clear JSON from {model} response. Attempting fallback.")
+                            raise ValueError("No valid JSON structure found")
                 
+                logging.info(f"Attempting to parse JSON: {json_str[:200]}...")
                 breakdown_list = json.loads(json_str)
                 
                 if not isinstance(breakdown_list, list) or not all(isinstance(item, dict) and \
-                                                                   'day' in item and 'date' in item and \
-                                                                   'hours' in item and 'summary' in item for item in breakdown_list):
+                                                                   'percentage' in item and \
+                                                                   'summary' in item for item in breakdown_list):
                     logging.error(f"Parsed JSON from {model} is not a list of valid breakdown dictionaries: {breakdown_list}")
                     raise ValueError("Parsed JSON is not a list of valid breakdown dictionaries.")
 
-                logging.info(f"Successfully generated AI breakdown with {len(breakdown_list)} days using {model}")
+                logging.info(f"Successfully generated AI breakdown with {len(breakdown_list)} steps using {model}")
                 return breakdown_list
                 
             except (json.JSONDecodeError, ValueError) as e:
@@ -267,22 +364,30 @@ def estimate_time(description: str, days_per_week: int = None, hours_per_day: fl
         logging.info(f"Heuristic estimated {minutes} minutes based on description length and keywords")
     
     breakdown = None
-    if days_per_week is not None and hours_per_day is not None and minutes is not None and minutes > 0:
+    if minutes is not None and minutes > 0:
         try:
-            if not (isinstance(days_per_week, (int, float)) and days_per_week > 0 and 
-                    isinstance(hours_per_day, (int, float)) and hours_per_day > 0):
-                logging.warning(f"Invalid days_per_week ({days_per_week}) or hours_per_day ({hours_per_day}). Skipping breakdown.")
-            else:
-                logging.info(f"Generating task breakdown for {minutes} minutes over {days_per_week} days/week and {hours_per_day} hours/day")
-                breakdown = get_task_breakdown(description, minutes, int(days_per_week), float(hours_per_day))
-                if not breakdown:
-                    logging.warning("Task breakdown generation failed, creating a simple default.")
-                    total_hours = minutes / 60
-                    breakdown = [generate_simple_breakdown(description, minutes, days_per_week, hours_per_day)]
+            logging.info(f"Generating task breakdown for {minutes} minutes")
+            # Use default values if days_per_week or hours_per_day are None
+            effective_days_per_week = days_per_week if days_per_week is not None else 5
+            effective_hours_per_day = hours_per_day if hours_per_day is not None else 2.0
+            
+            breakdown = get_task_breakdown(description, minutes, effective_days_per_week, effective_hours_per_day)
+            if not breakdown:
+                logging.warning("Task breakdown generation failed, creating a simple default.")
+                # Create a simple fallback breakdown
+                breakdown = [
+                    {"step": "Step 1: Planning", "percentage": 25, "summary": "Research, planning, and preparation"},
+                    {"step": "Step 2: Implementation", "percentage": 60, "summary": "Main execution and work"},
+                    {"step": "Step 3: Review", "percentage": 15, "summary": "Testing, review, and finalization"}
+                ]
         except Exception as e:
             logging.error(f"Error generating task breakdown: {str(e)}")
-            total_hours = minutes / 60
-            breakdown = [generate_simple_breakdown(description, minutes, days_per_week, hours_per_day)]
+            # Create a simple fallback breakdown
+            breakdown = [
+                {"step": "Step 1: Planning", "percentage": 25, "summary": "Research, planning, and preparation"},
+                {"step": "Step 2: Implementation", "percentage": 60, "summary": "Main execution and work"},
+                {"step": "Step 3: Review", "percentage": 15, "summary": "Testing, review, and finalization"}
+            ]
     elif minutes is None or minutes <= 0:
         logging.info(f"Skipping breakdown generation as estimated minutes is {minutes}.")
         return minutes, []  # Return empty list for breakdown

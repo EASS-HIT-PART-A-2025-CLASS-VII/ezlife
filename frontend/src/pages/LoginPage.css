@@ -10,6 +10,7 @@
   background-color: #f9f9f9;
   font-family: Arial, sans-serif;
   color: #333;
+  padding-top: calc(var(--navbar-height) + 2rem); /* Add padding for the fixed navbar */
 }
 
 .login-header {
@@ -98,6 +99,10 @@
 @media (max-width: 768px) {
   .login-header h1 {
     font-size: 2rem;
+  }
+  
+  .login-container {
+    padding-top: calc(var(--navbar-height) + 1rem); /* Adjust padding for smaller screens */
   }
 
   .login-header p {

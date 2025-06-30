@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   backend:
     build: ./backend
@@ -8,9 +6,10 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+    env_file:
+      - ./backend/.env
     environment:
-      - MONGO_URI=mongodb+srv://ezlifedb:ezlifepassword@ezlife.tyhljcz.mongodb.net/?retryWrites=true&w=majority&appName=EZlife
-      - HF_TOKEN=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
+      - TASK_ESTIMATION_SERVICE_URL=http://task-estimation-service:8002 # it's needed for the API calls (openrouter's requests format)
 
   frontend:
     build:
@@ -18,28 +17,45 @@ services:
       dockerfile: Dockerfile
     container_name: ezlife-frontend
     ports:
-      - "5173:80" # Frontend is served via Nginx on port 80 inside the container
+      - "5173:80" 
     depends_on:
       - backend
 
   user-service:
     build:
       context: ./backend
-      dockerfile: user-service/Dockerfile # Path relative to the new context
-    env_file:
-      - ./.env # Add this line to specify the .env file
+      dockerfile: user-service/Dockerfile 
     container_name: user-service
     ports:
       - "8001:8001"
-    environment:
-      - MONGO_URI=mongodb+srv://ezlifedb:ezlifepassword@ezlife.tyhljcz.mongodb.net/?retryWrites=true&w=majority&appName=EZlife
+    env_file:
+      - ./backend/.env
 
   task-estimation-service:
     build: ./backend/task-estimation-service
     container_name: task-estimation-service
     ports:
       - "8002:8002"
-    environment:
-      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY} # Added for the new service
+    env_file:
+      - ./backend/.env
     volumes:
-      - ./backend/task-estimation-service:/app # Optional: for development hot-reloading
+      - ./backend/task-estimation-service:/app 
+
+  file-service:
+    build:
+      context: ./backend/file-service
+      dockerfile: Dockerfile
+    container_name: file-service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/file-service:/app
+      - file_uploads:/app/uploads
+
+
+
+volumes:
+  file_uploads:
+    driver: local

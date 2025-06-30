@@ -3,9 +3,8 @@ Fallback implementation for task breakdown without relying on external APIs
 """
 import logging
 from typing import List, Dict, Tuple, Optional
-from breakdown_utils import generate_simple_breakdown  # Import the new utility
+from breakdown_utils import generate_simple_breakdown  
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def fallback_estimate_time(description: str, days_per_week: Optional[int] = None, hours_per_day: Optional[float] = None) -> Tuple[Optional[int], List[Dict]]:

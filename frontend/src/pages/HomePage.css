@@ -26,17 +26,158 @@ html, body {
 
 .homepage-header {
   margin-bottom: 2rem;
+  text-align: center;
+  padding: 1rem;
 }
 
 .homepage-header h1 {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.homepage-header p {
+  font-size: 1.4rem;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Styles for the non-authenticated home page */
+.not-logged-in-container {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+  padding: 2rem;
+}
+
+.welcome-banner {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.welcome-banner h2 {
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.welcome-banner p {
+  font-size: 1.3rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.feature-highlights {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.feature-highlight {
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+  background-color: var(--card-background);
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.feature-highlight:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px var(--hover-shadow);
+}
+
+.feature-highlight .feature-icon {
   font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature-highlight h3 {
+  font-size: 1.3rem;
   color: var(--text-color);
   margin-bottom: 0.5rem;
 }
 
-.homepage-header p {
-  font-size: 1.2rem;
+.feature-highlight p {
   color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .feature-highlights {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .feature-highlight {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .homepage-header h1 {
+    font-size: 2.2rem;
+  }
+  
+  .homepage-header p {
+    font-size: 1.1rem;
+  }
+  
+  .welcome-banner h2 {
+    font-size: 1.8rem;
+  }
+  
+  .not-logged-in-container {
+    padding: 1rem;
+  }
+}
+
+.homepage-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.homepage-actions .btn-primary,
+.homepage-actions .btn-secondary {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.homepage-actions .btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.homepage-actions .btn-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.homepage-actions .btn-primary:hover,
+.homepage-actions .btn-secondary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px var(--shadow-color);
 }
 
 /* Styles for logged-in users */

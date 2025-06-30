@@ -117,11 +117,33 @@ export default function HomePage({ isAuthenticated, onLogout, tasks = [] }) {
                 <li>Set realistic due dates for your tasks</li>
               </ul>
             </div>
-          </div>
-        ) : (
-          <div className="homepage-actions">
-            <Link to="/login" className="btn-secondary">Login</Link>
-            <Link to="/register" className="btn-secondary">Register</Link>
+          </div>        ) : (
+          <div className="not-logged-in-container">
+            <div className="welcome-banner">
+              <h2>Get Started with EZlife</h2>
+              <p>The easiest way to organize your life and boost productivity.</p>
+              <div className="feature-highlights">
+                <div className="feature-highlight">
+                  <div className="feature-icon">📝</div>
+                  <h3>Task Management</h3>
+                  <p>Create, organize, and complete tasks with ease.</p>
+                </div>
+                <div className="feature-highlight">
+                  <div className="feature-icon">⏱️</div>
+                  <h3>Smart Time Estimation</h3>
+                  <p>AI-powered time estimation for better planning.</p>
+                </div>
+                <div className="feature-highlight">
+                  <div className="feature-icon">📁</div>
+                  <h3>File Storage</h3>
+                  <p>Keep all your important files in one place.</p>
+                </div>
+              </div>
+            </div>
+            <div className="homepage-actions">
+              <Link to="/login" className="btn-primary">Login</Link>
+              <Link to="/register" className="btn-secondary">Create Account</Link>
+            </div>
           </div>
         )}
       </div> {/* Close homepage-content-wrapper */}

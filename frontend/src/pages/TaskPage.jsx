@@ -6,14 +6,27 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskEstimate, setNewTaskEstimate] = useState("");
   const [newTaskDueDate, setNewTaskDueDate] = useState("");
-  const [newTaskDaysPerWeek, setNewTaskDaysPerWeek] = useState(5);
-  const [newTaskHoursPerDay, setNewTaskHoursPerDay] = useState(4);
+  const [newTaskDaysPerWeek, setNewTaskDaysPerWeek] = useState("");
+  const [newTaskHoursPerDay, setNewTaskHoursPerDay] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [aiEstimating, setAiEstimating] = useState(false);
   const [filter, setFilter] = useState('all');
   const [showBreakdownTaskId, setShowBreakdownTaskId] = useState(null);
   const [breakdownResult, setBreakdownResult] = useState('');
   const [isLoadingBreakdown, setIsLoadingBreakdown] = useState(false);
+
+  // Function to format minutes as hours:minutes - UPDATED VERSION 2025
+  const formatTimeEstimate = (minutes) => {
+    if (!minutes || minutes === 0) return "";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours === 0) {
+      return `${mins}min`;
+    } else if (mins === 0) {
+      return `${hours}h`;
+    } else {
+      return `${hours}h ${mins}min`;
+    }
+  };
 
   const fetchTasks = () => {
     // Function stub for fetchTasks, may be used later
@@ -34,16 +47,20 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
     e.preventDefault();
     if (newTaskDescription.trim()) {
       setIsSubmitting(true);
-      if (!newTaskEstimate) {
-        setAiEstimating(true);
-      }
 
       const taskData = {
         description: newTaskDescription.trim(),
-        completed: false,
-        days_per_week: newTaskDaysPerWeek,
-        hours_per_day: newTaskHoursPerDay
+        completed: false
       };
+
+      // Only include days_per_week and hours_per_day if they have values
+      if (newTaskDaysPerWeek && !isNaN(newTaskDaysPerWeek)) {
+        taskData.days_per_week = parseInt(newTaskDaysPerWeek);
+      }
+      
+      if (newTaskHoursPerDay && !isNaN(newTaskHoursPerDay)) {
+        taskData.hours_per_day = parseFloat(newTaskHoursPerDay);
+      }
 
       if (newTaskEstimate) {
         taskData.estimated_minutes = parseInt(newTaskEstimate);
@@ -57,17 +74,19 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
       if (addTaskPromise && typeof addTaskPromise.then === 'function') {
         addTaskPromise.then(() => {
           setIsSubmitting(false);
-          setAiEstimating(false);
           setNewTaskDescription("");
           setNewTaskEstimate("");
           setNewTaskDueDate("");
+          setNewTaskDaysPerWeek("");
+          setNewTaskHoursPerDay("");
         });
       } else {
         setIsSubmitting(false);
-        setAiEstimating(false);
         setNewTaskDescription("");
         setNewTaskEstimate("");
         setNewTaskDueDate("");
+        setNewTaskDaysPerWeek("");
+        setNewTaskHoursPerDay("");
       }
     }
   };
@@ -80,7 +99,9 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
   });
 
   const pendingTasksCount = tasks.filter(task => !task.completed).length;
-  const completedTasksCount = tasks.filter(task => task.completed).length;  return (
+  const completedTasksCount = tasks.filter(task => task.completed).length;
+
+  return (
     <div className="page-container taskpage-container">
       <div className="task-page-content">
         <h1 className="page-title">Your Tasks</h1>
@@ -88,6 +109,17 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
 
         <div className="task-form-container">
         <h2>Add a New Task</h2>
+        
+        <div className="instructions">
+          <p><strong>How to add tasks:</strong></p>
+          <ul>
+            <li><strong>Task description:</strong> Enter what you want to accomplish (e.g., "learn Python basics")</li>
+            <li><strong>Due date:</strong> When you want to complete the task (optional)</li>
+            <li><strong>Time fields:</strong> Leave blank for AI to estimate automatically, or fill in for custom scheduling</li>
+            <li>Our AI will provide realistic time estimates and step-by-step breakdowns for beginners!</li>
+          </ul>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div className="task-input-group">
             <input
@@ -128,24 +160,9 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
               onChange={(e) => setNewTaskHoursPerDay(e.target.value)}
             />
           </div>
-          <div className="d-flex justify-content-between align-items-center">
-            <button type="submit" className="btn btn-primary">Add Task</button>
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
-              disabled={aiEstimating || !newTaskDescription}
-              onClick={() => {
-                if (newTaskDescription) {
-                  setAiEstimating(true);
-                  // Normally would call AI estimation API here
-                  setTimeout(() => {
-                    setNewTaskEstimate("60"); // Simulated response
-                    setAiEstimating(false);
-                  }, 1000);
-                }
-              }}
-            >
-              {aiEstimating ? 'Estimating...' : 'AI Estimate Time'}
+          <div className="d-flex justify-content-center align-items-center">
+            <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Adding...' : 'Add Task'}
             </button>
           </div>
         </form>
@@ -193,7 +210,7 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
                   <strong className={task.completed ? 'text-muted' : ''}>{task.description}</strong>
                   <div className="task-item-details">
                     {task.due_date && <small className="text-muted">Due: {formatDate(task.due_date)}</small>}
-                    {task.estimated_minutes && <small className="text-muted">Est: {task.estimated_minutes} mins</small>}
+                    {task.estimated_minutes && <small className="text-muted">Est: {formatTimeEstimate(task.estimated_minutes)}</small>}
                   </div>
                 </div>
                 <div className="task-actions">
@@ -208,16 +225,28 @@ export default function TaskPage({ tasks = [], onToggleTask, onDeleteTask, onAdd
                       } else {
                         setShowBreakdownTaskId(task.id);
                         setIsLoadingBreakdown(true);
-                        // Simulate loading a breakdown
-                        setTimeout(() => {
-                          setBreakdownResult(`<p>Task breakdown for "${task.description}":</p>
+                        
+                        // Show the breakdown from the task data if available
+                        if (task.breakdown && task.breakdown.length > 0) {
+                          const breakdownHtml = `<p>Task breakdown for "${task.description}":</p>
                             <ul>
-                              <li>Step 1: Research and planning (30% of time)</li>
-                              <li>Step 2: Implementation (50% of time)</li>
-                              <li>Step 3: Testing and review (20% of time)</li>
-                            </ul>`);
+                              ${task.breakdown.map(item => 
+                                `<li><strong>${item.step}:</strong> ${item.summary} (${item.percentage}% of time)</li>`
+                              ).join('')}
+                            </ul>`;
+                          setBreakdownResult(breakdownHtml);
                           setIsLoadingBreakdown(false);
-                        }, 1000);
+                        } else {
+                          // Fallback if no breakdown data available
+                          const fallbackHtml = `<p>Task breakdown for "${task.description}":</p>
+                            <ul>
+                              <li><strong>Step 1: Planning and Research</strong> (25% of time)</li>
+                              <li><strong>Step 2: Main Implementation</strong> (60% of time)</li>
+                              <li><strong>Step 3: Review and Finalization</strong> (15% of time)</li>
+                            </ul>`;
+                          setBreakdownResult(fallbackHtml);
+                          setIsLoadingBreakdown(false);
+                        }
                       }
                     }} 
                     className="btn btn-info"

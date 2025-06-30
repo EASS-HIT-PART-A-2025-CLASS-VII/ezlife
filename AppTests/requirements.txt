@@ -1,0 +1,6 @@
+# Test Dependencies for EZLife Backend Services
+pytest==7.4.3
+requests==2.31.0
+pytest-html==4.1.1
+pytest-cov==4.1.0
+pytest-xdist==3.5.0

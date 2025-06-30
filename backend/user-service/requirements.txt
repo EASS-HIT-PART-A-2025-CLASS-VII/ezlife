@@ -4,6 +4,5 @@ python-dotenv
 uvicorn
 requests
 python-multipart
-passlib[bcrypt]
+passlib
 email-validator
-pydantic

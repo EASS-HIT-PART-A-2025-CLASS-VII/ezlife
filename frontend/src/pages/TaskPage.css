@@ -862,7 +862,34 @@ progress::-moz-progress-bar {
   }
 }
 
-/* Ensure icon styles are applied if you use them (e.g., from an icon library) */
-.icon {
-  margin-right: 8px; /* Example */
+.task-form-container .instructions {
+  width: 100%;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.task-form-container .instructions p {
+  margin: 0 0 0.8rem 0;
+  color: #495057;
+  font-weight: 600;
+}
+
+.task-form-container .instructions ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  list-style-type: disc;
+}
+
+.task-form-container .instructions li {
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.task-form-container .instructions li strong {
+  color: #495057;
 }

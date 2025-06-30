@@ -3,12 +3,10 @@ from pydantic import BaseModel, Field
 from typing import List, Dict, Optional, Tuple
 import logging
 import os
-
-# Import your estimator functions
 from ai_estimator import estimate_time as ai_estimate_time, OPENROUTER_API_KEY
 from fallback_estimator import fallback_estimate_time
 
-# Configure logging
+# Configure logging (required by openrouter)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = FastAPI(
@@ -42,7 +40,7 @@ async def estimate_task_time(request: TaskEstimationRequest):
 
     estimated_minutes: Optional[int] = None
     task_breakdown: Optional[List[Dict]] = None
-    source: str = "unknown" # Initialize source
+    source: str = "unknown" 
 
     try:
         if OPENROUTER_API_KEY:
@@ -74,7 +72,7 @@ async def estimate_task_time(request: TaskEstimationRequest):
             "source": source
         }
         
-    except HTTPException as http_exc: # Re-raise HTTPExceptions
+    except HTTPException as http_exc: 
         raise http_exc
     except Exception as e:
         logging.error(f"Unexpected error in estimate_task_time endpoint: {str(e)}", exc_info=True)
@@ -106,4 +104,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8002) # Port for task-estimation-service
+    uvicorn.run(app, host="0.0.0.0", port=8002) 

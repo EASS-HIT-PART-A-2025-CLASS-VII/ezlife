@@ -10,11 +10,11 @@ export default function Navbar({ isAuthenticated, onLogout }) {
         <Link to="/">EZlife</Link>
       </div>      
       <div className="navbar-links">
-        <Link to="/">Home</Link>
-        {isAuthenticated ? (
+        <Link to="/">Home</Link>        {isAuthenticated ? (
           <>
             <Link to="/tasks">Tasks</Link>
-            <Link to="/calendar">Calendar</Link> {/* Added Calendar link */}
+            <Link to="/calendar">Calendar</Link>
+            <Link to="/files">Files</Link> {/* Added Files link */}
             <Link to="/settings">Settings</Link>
             <button onClick={onLogout} className="btn-logout">Logout</button>
           </>
